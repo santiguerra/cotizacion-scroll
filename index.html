@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propuesta Estratégica: Plataforma de Asesores IA para WhatsApp | Scroll</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:wght@600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            scroll: {
+              navy: '#01122a',
+              dark: '#031b3d',
+              blue: '#033369',
+              deep: '#022751',
+              petroleo: '#043E71',
+              turquesa: '#02CCB5',
+              turquesaLight: '#02E7C1',
+              lima: '#AEF905',
+              limaHover: '#98dc03',
+              papel: '#F5F4F3',
+              tinta: '#1E2B8C'
+            }
+          },
+          fontFamily: {
+            display: ['Montserrat', 'sans-serif'],
+            body: ['Poppins', 'sans-serif'],
+            script: ['Kaushan Script', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --scroll-grad: linear-gradient(135deg, #043E71 0%, #036A86 40%, #02CCB5 80%, #02E7C1 100%);
+    }
+
+    body {
+      background-color: #01122a;
+      color: #f1f5f9;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Glows & Gradients */
+    .brand-gradient {
+      background: var(--scroll-grad);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #FFFFFF 20%, #02E7C1 70%, #AEF905 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .text-gradient-turquesa {
+      background: linear-gradient(135deg, #02E7C1 0%, #02CCB5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glow-lima {
+      box-shadow: 0 0 25px rgba(174, 249, 5, 0.35);
+    }
+    .glow-turquesa {
+      box-shadow: 0 0 25px rgba(2, 204, 181, 0.3);
+    }
+
+    /* Glassmorphism */
+    .glass-card {
+      background: rgba(3, 27, 61, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(2, 204, 181, 0.15);
+    }
+    .glass-card-active {
+      background: rgba(4, 45, 99, 0.75);
+      border: 1.5px solid #AEF905;
+      box-shadow: 0 0 30px rgba(174, 249, 5, 0.2);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #01122a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #033369;
+      border-radius: 4px;
+      border: 1px solid rgba(2, 204, 181, 0.3);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #02CCB5;
+    }
+
+    /* WhatsApp Simulator Styles */
+    .wa-bubble-in {
+      background: #202c33;
+      border-radius: 0 12px 12px 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .wa-bubble-out {
+      background: #005c4b;
+      border-radius: 12px 0 12px 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white !important;
+        color: #1a202c !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .glass-card {
+        background: white !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        color: #1a202c !important;
+      }
+      .text-gradient, .text-gradient-turquesa {
+        -webkit-text-fill-color: #033369 !important;
+      }
+    }
+  </style>
+</head>
+<body class="selection:bg-scroll-lima selection:text-scroll-navy">
+
+  <!-- Ambient Glowing Orbs -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-scroll-blue/30 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="fixed top-1/3 right-10 w-[450px] h-[450px] bg-scroll-turquesa/15 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-10 left-1/3 w-[500px] h-[500px] bg-scroll-lima/10 rounded-full blur-[180px] pointer-events-none -z-10"></div>
+
+  <!-- TOP NAVBAR -->
+  <nav class="sticky top-0 z-50 glass-card border-b border-scroll-turquesa/20 px-6 py-4 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo.jpg" alt="Scroll" class="w-10 h-10 rounded-full border border-scroll-turquesa/40 shadow-sm" onerror="this.style.display='none'">
+        <div>
+          <span class="font-display font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
+            scrôll
+            <span class="text-[9px] bg-scroll-turquesa/20 text-scroll-turquesaLight px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Agency</span>
+          </span>
+          <p class="text-[10px] text-slate-400 font-medium">Transformación Digital</p>
+        </div>
+      </div>
+
+      <!-- Links Desktop -->
+      <div class="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
+        <a href="#vision" class="hover:text-scroll-lima transition">Visión Estratégica</a>
+        <a href="#simulador" class="hover:text-scroll-lima transition flex items-center gap-1 text-scroll-turquesaLight">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Simulador En Vivo
+        </a>
+        <a href="#arquitectura" class="hover:text-scroll-lima transition">Plataforma</a>
+        <a href="#precios" class="hover:text-scroll-lima transition">Planes & Cotización</a>
+        <a href="#onboarding" class="hover:text-scroll-lima transition">Acompañamiento 19h</a>
+        <a href="#roi" class="hover:text-scroll-lima transition text-scroll-lima font-semibold">Calculadora ROI</a>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <button onclick="window.print()" class="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-slate-600 hover:border-scroll-turquesa text-slate-300 hover:text-white transition">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+          <span>Imprimir / PDF</span>
+        </button>
+        <a href="#contacto" class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-scroll-lima text-scroll-navy hover:bg-scroll-limaHover transition glow-lima flex items-center gap-1.5">
+          <span>¡Trabajemos juntos!</span>
+          <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <header class="relative pt-16 pb-20 px-6 max-w-7xl mx-auto text-center">
+    <!-- Super Tag -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-scroll-blue/40 border border-scroll-turquesa/30 text-scroll-turquesaLight text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-scroll-lima animate-pulse"></span>
+      <span>Propuesta Estratégica & Técnica 2026 — Para Scroll Agencia</span>
+    </div>
+
+    <!-- Main Title -->
+    <h1 class="font-display font-black text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[1.1] mb-6">
+      El Marketing de Scroll ya no es un gasto:<br class="hidden sm:block">
+      es una <span class="text-gradient">máquina de ventas</span>.
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="max-w-3xl mx-auto text-slate-300 text-base sm:text-xl font-normal leading-relaxed mb-10">
+      Una plataforma web multi-empresa exclusiva de Scroll para que cada cliente tenga su propio 
+      <span class="text-white font-semibold">Asesor de Ventas con IA en WhatsApp</span>, cerrando de forma autónoma la brecha entre el anuncio digital y el dinero en caja.
+    </p>
+
+    <!-- Key Metrics Badges -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
+      <div class="glass-card p-4 rounded-2xl text-left border-l-4 border-l-scroll-turquesa">
+        <p class="text-2xl sm:text-3xl font-display font-extrabold text-white">100%</p>
+        <p class="text-xs text-slate-400">Multi-Empresa Aislado (Cada cliente en su entorno)</p>
+      </div>
+      <div class="glass-card p-4 rounded-2xl text-left border-l-4 border-l-scroll-lima">
+        <p class="text-2xl sm:text-3xl font-display font-extrabold text-scroll-lima">&lt; 10 seg</p>
+        <p class="text-xs text-slate-400">Respuesta instantánea 24/7 a leads de anuncios</p>
+      </div>
+      <div class="glass-card p-4 rounded-2xl text-left border-l-4 border-l-scroll-turquesaLight">
+        <p class="text-2xl sm:text-3xl font-display font-extrabold text-white">19 Horas</p>
+        <p class="text-xs text-slate-400">Acompañamiento in situ por empresa (Firma Scroll)</p>
+      </div>
+      <div class="glass-card p-4 rounded-2xl text-left border-l-4 border-l-scroll-blue">
+        <p class="text-2xl sm:text-3xl font-display font-extrabold text-white">ROI Claro</p>
+        <p class="text-xs text-slate-400">Métricas de leads calificados para retener clientes</p>
+      </div>
+    </div>
+
+    <!-- Quick CTA buttons -->
+    <div class="flex flex-wrap justify-center items-center gap-4">
+      <a href="#simulador" class="px-6 py-3.5 rounded-xl font-display font-bold text-sm bg-gradient-to-r from-scroll-turquesa to-scroll-turquesaLight text-scroll-navy hover:opacity-95 transition glow-turquesa flex items-center gap-2">
+        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+        Probar Simulador en Vivo
+      </a>
+      <a href="#precios" class="px-6 py-3.5 rounded-xl font-display font-bold text-sm glass-card text-white hover:border-scroll-lima transition flex items-center gap-2">
+        <span>Ver las 3 Opciones de Inversión</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-scroll-lima"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- STRATEGY SECTION: THE HOOK FOR SCROLL -->
+  <section id="vision" class="py-16 px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <span class="text-scroll-lima text-xs font-bold uppercase tracking-widest font-display">• El Factor Diferenciador •</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">
+        ¿Por qué esto blinda los planes de $2.000.000+ de Scroll?
+      </h2>
+      <p class="text-slate-400 text-sm max-w-2xl mx-auto mt-2">
+        Las empresas medianas no cancelan agencias que les muestran dinero en la cuenta bancaria.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 items-stretch">
+      <!-- Old Way -->
+      <div class="glass-card p-8 rounded-3xl border border-red-500/20 relative">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-white">El modelo tradicional de agencia</h3>
+            <p class="text-xs text-red-300">Vulnerable al "¿Y esto para qué me sirvió?"</p>
+          </div>
+        </div>
+
+        <ul class="space-y-4 text-xs text-slate-300">
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="x" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+            <span>Scroll hace un trabajo brillante de pauta y contenido, atrayendo decenas de prospectos a WhatsApp.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="x" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+            <span>La empresa cliente no tiene un equipo de ventas rápido; contestan 4 horas después o en fines de semana.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="x" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+            <span>El lead se enfría, se va con la competencia y el cliente culpa a Scroll: <em>"Es que el marketing no me vendió"</em>.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- New Way: With Bot -->
+      <div class="glass-card p-8 rounded-3xl border border-scroll-lima/40 relative glow-lima">
+        <div class="absolute -top-3 right-6 bg-scroll-lima text-scroll-navy font-display font-black text-[10px] uppercase px-3 py-1 rounded-full tracking-wider">
+          El Ecosistema Scroll
+        </div>
+
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-scroll-lima/20 flex items-center justify-center text-scroll-lima">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-white">Con la Plataforma de Asesor IA de Scroll</h3>
+            <p class="text-xs text-scroll-turquesaLight">Inversión con Retorno Comprobable</p>
+          </div>
+        </div>
+
+        <ul class="space-y-4 text-xs text-slate-200">
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima shrink-0 mt-0.5"></i>
+            <span><strong>Respuesta en 5 segundos:</strong> El bot saluda al instante, con el tono y catálogo exacto de esa empresa.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima shrink-0 mt-0.5"></i>
+            <span><strong>Filtro inteligente:</strong> Descarta a los "curiosos" y califica a quien tiene presupuesto y urgencia real.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima shrink-0 mt-0.5"></i>
+            <span><strong>Traspaso en bandeja de plata:</strong> Cuando el lead está caliente, lo pasa al asesor humano listo para cobrar.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima shrink-0 mt-0.5"></i>
+            <span><strong>Scroll entrega reportes de ventas reales:</strong> Retención de contratos garantizada mes a mes.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE SIMULATOR SECTION (THE WOW IN THE BOARDROOM) -->
+  <section id="simulador" class="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
+    <div class="text-center mb-10">
+      <span class="text-scroll-turquesaLight text-xs font-bold uppercase tracking-widest font-display">• Demostración Interactiva •</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">
+        Vive la experiencia que tendrán los clientes de Scroll
+      </h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto mt-2">
+        Interactúa con este teléfono simulador en tiempo real. Prueba cómo el bot atiende, filtra y entrega el lead caliente.
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto">
+      <!-- Simulator Controls -->
+      <div class="lg:col-span-5 space-y-4 order-2 lg:order-1">
+        <div class="glass-card p-6 rounded-2xl">
+          <h3 class="font-display font-bold text-base text-white mb-2 flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-scroll-lima"></i>
+            Paso a Paso del Flujo
+          </h3>
+          <p class="text-xs text-slate-300 mb-4">
+            Presiona cada botón para simular cómo un usuario proveniente de un anuncio en Instagram o TikTok es filtrado:
+          </p>
+
+          <div class="space-y-2.5">
+            <button onclick="triggerSimStep(1)" id="btn-step-1" class="w-full text-left p-3 rounded-xl bg-scroll-navy/70 border border-scroll-turquesa/30 hover:border-scroll-lima transition text-xs flex items-center justify-between group">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-scroll-blue text-scroll-turquesaLight flex items-center justify-center font-bold text-[10px]">1</span>
+                <span class="font-medium text-white group-hover:text-scroll-lima">Llega lead desde anuncio</span>
+              </div>
+              <i data-lucide="play" class="w-3.5 h-3.5 text-slate-400 group-hover:text-scroll-lima"></i>
+            </button>
+
+            <button onclick="triggerSimStep(2)" id="btn-step-2" class="w-full text-left p-3 rounded-xl bg-scroll-navy/70 border border-scroll-turquesa/30 hover:border-scroll-lima transition text-xs flex items-center justify-between group">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-scroll-blue text-scroll-turquesaLight flex items-center justify-center font-bold text-[10px]">2</span>
+                <span class="font-medium text-white group-hover:text-scroll-lima">Bot saluda y presenta opciones</span>
+              </div>
+              <i data-lucide="play" class="w-3.5 h-3.5 text-slate-400 group-hover:text-scroll-lima"></i>
+            </button>
+
+            <button onclick="triggerSimStep(3)" id="btn-step-3" class="w-full text-left p-3 rounded-xl bg-scroll-navy/70 border border-scroll-turquesa/30 hover:border-scroll-lima transition text-xs flex items-center justify-between group">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-scroll-blue text-scroll-turquesaLight flex items-center justify-center font-bold text-[10px]">3</span>
+                <span class="font-medium text-white group-hover:text-scroll-lima">Lead manifiesta interés y presupuesto</span>
+              </div>
+              <i data-lucide="play" class="w-3.5 h-3.5 text-slate-400 group-hover:text-scroll-lima"></i>
+            </button>
+
+            <button onclick="triggerSimStep(4)" id="btn-step-4" class="w-full text-left p-3 rounded-xl bg-scroll-navy/70 border border-scroll-turquesa/30 hover:border-scroll-lima transition text-xs flex items-center justify-between group">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-scroll-lima text-scroll-navy flex items-center justify-center font-bold text-[10px]">4</span>
+                <span class="font-bold text-scroll-lima">¡Lead Calificado! Pasa a Humano</span>
+              </div>
+              <i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i>
+            </button>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-700/50 flex justify-between items-center">
+            <button onclick="resetSimulator()" class="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 transition">
+              <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reiniciar Simulación
+            </button>
+            <span id="sim-status" class="text-[10px] text-scroll-turquesaLight bg-scroll-turquesa/10 px-2 py-0.5 rounded-full font-mono">Listo</span>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl text-xs text-slate-400 flex items-start gap-2.5">
+          <i data-lucide="info" class="w-4 h-4 text-scroll-lima shrink-0 mt-0.5"></i>
+          <span>La IA no inventa ni alucina: opera bajo las reglas estrictas, catálogo y condiciones configuradas por Santiago en la jornada de 19h.</span>
+        </div>
+      </div>
+
+      <!-- Smartphone Device Mockup -->
+      <div class="lg:col-span-7 flex justify-center order-1 lg:order-2">
+        <div class="w-full max-w-[340px] bg-[#111b21] rounded-[42px] p-3.5 border-4 border-slate-700 shadow-2xl relative">
+          <!-- Notch / Speaker -->
+          <div class="w-32 h-4 bg-slate-800 rounded-b-xl mx-auto mb-2 flex items-center justify-center">
+            <div class="w-10 h-1 bg-slate-600 rounded-full"></div>
+          </div>
+
+          <!-- WhatsApp Header -->
+          <div class="bg-[#202c33] rounded-t-2xl px-3 py-2.5 flex items-center justify-between text-white border-b border-slate-700">
+            <div class="flex items-center gap-2">
+              <i data-lucide="arrow-left" class="w-4 h-4 text-slate-300"></i>
+              <div class="w-8 h-8 rounded-full bg-scroll-blue flex items-center justify-center text-xs font-bold text-scroll-lima border border-scroll-turquesa">
+                SC
+              </div>
+              <div>
+                <p class="text-xs font-semibold leading-tight flex items-center gap-1">
+                  Cliente Scroll Demo
+                  <i data-lucide="badge-check" class="w-3 h-3 text-scroll-turquesaLight"></i>
+                </p>
+                <p class="text-[10px] text-scroll-turquesaLight font-mono">Asesor IA Activo</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-slate-300">
+              <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+              <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+
+          <!-- Chat Body Screen -->
+          <div id="chat-messages" class="h-[380px] overflow-y-auto p-3 space-y-3 bg-[#0b141a] text-xs font-sans">
+            <!-- Initial System Marker -->
+            <div class="text-center my-1">
+              <span class="bg-[#182229] text-slate-400 text-[9px] px-2.5 py-1 rounded-md shadow-sm">
+                Mensaje iniciado desde anuncio de Instagram
+              </span>
+            </div>
+
+            <!-- Messages will appear here via JS -->
+          </div>
+
+          <!-- Typing Indicator (hidden by default) -->
+          <div id="chat-typing" class="hidden px-4 py-1.5 bg-[#0b141a] text-[10px] text-scroll-turquesaLight flex items-center gap-1 font-mono">
+            <span>Asesor IA escribiendo</span>
+            <span class="animate-bounce">.</span>
+            <span class="animate-bounce delay-100">.</span>
+            <span class="animate-bounce delay-200">.</span>
+          </div>
+
+          <!-- WhatsApp Input bar -->
+          <div class="bg-[#202c33] rounded-b-2xl p-2 flex items-center gap-2 border-t border-slate-700">
+            <div class="flex-1 bg-[#2a3942] rounded-full px-3 py-1.5 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Escribe un mensaje...</span>
+              <i data-lucide="paperclip" class="w-3.5 h-3.5 text-slate-400"></i>
+            </div>
+            <div class="w-7 h-7 rounded-full bg-scroll-turquesa text-scroll-navy flex items-center justify-center">
+              <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM ARCHITECTURE (WHAT IS IN THE BOX) -->
+  <section id="arquitectura" class="py-16 px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <span class="text-scroll-lima text-xs font-bold uppercase tracking-widest font-display">• Qué se entrega •</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">
+        Ecosistema Web Multi-Empresa Scroll
+      </h2>
+      <p class="text-slate-400 text-sm max-w-2xl mx-auto mt-2">
+        No es un script en una consola de código; es una plataforma comercial moderna lista para que Scroll la venda.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Module 1 -->
+      <div class="glass-card p-6 rounded-2xl border-t-4 border-t-scroll-turquesa">
+        <div class="w-10 h-10 rounded-xl bg-scroll-turquesa/10 flex items-center justify-center text-scroll-turquesa mb-4">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-display font-bold text-base text-white mb-2">Panel Master de Scroll</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Control total para la jefa o el equipo de Scroll. Crea nuevas empresas, activa o suspende accesos y monitorea el consumo global de IA.
+        </p>
+        <ul class="mt-4 space-y-1.5 text-[11px] text-slate-400">
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Creación rápida de inquilinos (Tenants)</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Medidor global de tokens consumidos</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Reporte para facturar a cada cliente</li>
+        </ul>
+      </div>
+
+      <!-- Module 2 -->
+      <div class="glass-card p-6 rounded-2xl border-t-4 border-t-scroll-lima">
+        <div class="w-10 h-10 rounded-xl bg-scroll-lima/10 flex items-center justify-center text-scroll-lima mb-4">
+          <i data-lucide="store" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-display font-bold text-base text-white mb-2">Portal Privado para la Empresa</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Cada cliente de Scroll entra con su usuario y contraseña independientes. Sus datos, chats y catálogos están 100% aislados.
+        </p>
+        <ul class="mt-4 space-y-1.5 text-[11px] text-slate-400">
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Vinculación por Código QR en pantalla</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Gestor visual de Catálogo (servicios/precios)</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Historial de chats y leads en tiempo real</li>
+        </ul>
+      </div>
+
+      <!-- Module 3 -->
+      <div class="glass-card p-6 rounded-2xl border-t-4 border-t-scroll-turquesaLight">
+        <div class="w-10 h-10 rounded-xl bg-scroll-turquesaLight/10 flex items-center justify-center text-scroll-turquesaLight mb-4">
+          <i data-lucide="bot" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-display font-bold text-base text-white mb-2">Motor de Filtrado Inteligente</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Basado en la robusta lógica conversacional probada en ServirPlus, adaptado para calificar compradores en lugar de candidatos laborales.
+        </p>
+        <ul class="mt-4 space-y-1.5 text-[11px] text-slate-400">
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Manejo de objeciones básicas y horarios</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Criterios de calificación a medida del cliente</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-scroll-lima"></i> Alerta inmediata al asesor de ventas humano</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING & OPTIONS SECTION (THE 3 PROPOSALS ON THE TABLE) -->
+  <section id="precios" class="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
+    <div class="text-center mb-12">
+      <span class="text-scroll-lima text-xs font-bold uppercase tracking-widest font-display">• Opciones Transparentes •</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">
+        Tres Caminos para la Plataforma
+      </h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto mt-2">
+        Elige el modelo que mejor se alinee al flujo financiero y la estrategia de Scroll.
+      </p>
+    </div>
+
+    <!-- 3 Cards Grid -->
+    <div class="grid lg:grid-cols-3 gap-8 items-stretch">
+      
+      <!-- Option B: MVP -->
+      <div class="glass-card p-8 rounded-3xl flex flex-col justify-between border-t-2 border-t-slate-500">
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Opción B</span>
+            <span class="bg-slate-700/60 text-slate-300 text-[10px] font-semibold px-2 py-0.5 rounded-full">Validación Rápida</span>
+          </div>
+          <h3 class="font-display font-extrabold text-xl text-white">MVP Esencial</h3>
+          <p class="text-xs text-slate-400 mt-1 mb-6">Para arrancar con 2 o 3 clientes piloto sin asumir compromisos mensuales.</p>
+          
+          <div class="mb-6">
+            <span class="text-xs text-slate-400">Inversión única</span>
+            <div class="font-display font-black text-3xl text-white">$2.500.000 <span class="text-xs font-normal text-slate-400">COP</span></div>
+            <p class="text-[11px] text-slate-400 mt-1">Sin mensualidad para Santiago</p>
+          </div>
+
+          <div class="border-t border-slate-700/60 pt-4 space-y-2.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-slate-400"></i> Login y roles para clientes</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-slate-400"></i> Conexión WhatsApp por QR</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-slate-400"></i> Catálogo e instrucciones básicas</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-slate-400"></i> Medidor básico de consumo</div>
+            <div class="flex items-center gap-2 text-slate-500"><i data-lucide="minus" class="w-4 h-4"></i> Dashboard de retorno avanzado (Fase 2)</div>
+            <div class="flex items-center gap-2 text-slate-500"><i data-lucide="minus" class="w-4 h-4"></i> Soporte y servidor asumido por Scroll</div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-700/40">
+          <p class="text-[11px] text-slate-400">Ideal si Scroll solo quiere probar el concepto sin delegar soporte.</p>
+        </div>
+      </div>
+
+      <!-- Option C: Licencia + Soporte (RECOMMENDED) -->
+      <div class="glass-card-active p-8 rounded-3xl flex flex-col justify-between relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-scroll-lima text-scroll-navy font-display font-black text-[11px] uppercase tracking-wider px-4 py-1 rounded-full shadow-lg">
+          ★ Más Rentable para Scroll
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-4 pt-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-scroll-lima">Opción C</span>
+            <span class="bg-scroll-lima/20 text-scroll-lima text-[10px] font-bold px-2 py-0.5 rounded-full">Llave en Mano</span>
+          </div>
+          <h3 class="font-display font-extrabold text-2xl text-white">Licencia Pro + Operación Activa</h3>
+          <p class="text-xs text-slate-300 mt-1 mb-6">Scroll vende el servicio con plataforma completa y Santiago se encarga de que nunca se caiga.</p>
+          
+          <div class="mb-6">
+            <span class="text-xs text-slate-400">Entrada inicial</span>
+            <div class="font-display font-black text-3xl text-scroll-lima">$2.500.000 <span class="text-xs font-normal text-slate-300">COP</span></div>
+            <div class="mt-1 flex items-baseline gap-1 text-xs text-scroll-turquesaLight font-semibold">
+              <span>+ $90.000 COP / mes</span>
+              <span class="text-[10px] text-slate-400 font-normal">por cada empresa activa</span>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-700/60 pt-4 space-y-2.5 text-xs text-slate-200">
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i> <strong>Plataforma Completa</strong> (Reportes, exportación, alertas)</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i> <strong>Servidor incluido y administrado</strong> por Santiago</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i> <strong>Reconexión inmediata</strong> de bots caídos</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i> Mantenimiento continuo ante cambios de WhatsApp</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i> Scroll traslada este costo al cliente con 90%+ de margen</div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-scroll-lima/30">
+          <p class="text-[11px] text-slate-300">
+            <strong>¿Por qué funciona?</strong> Scroll no necesita contratar ingenieros ni lidiar con servidores; solo se dedica a vender y cobrar mensualidades.
+          </p>
+        </div>
+      </div>
+
+      <!-- Option A: Compra Total -->
+      <div class="glass-card p-8 rounded-3xl flex flex-col justify-between border-t-2 border-t-scroll-turquesa">
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-scroll-turquesaLight">Opción A</span>
+            <span class="bg-scroll-turquesa/20 text-scroll-turquesaLight text-[10px] font-semibold px-2 py-0.5 rounded-full">Activo Propio</span>
+          </div>
+          <h3 class="font-display font-extrabold text-xl text-white">Adquisición Total del Código</h3>
+          <p class="text-xs text-slate-400 mt-1 mb-6">Scroll compra la propiedad intelectual exclusiva y es dueña absoluta del software.</p>
+          
+          <div class="mb-6">
+            <span class="text-xs text-slate-400">Pago único</span>
+            <div class="font-display font-black text-3xl text-white">$7.500.000 <span class="text-xs font-normal text-slate-400">COP</span></div>
+            <p class="text-[11px] text-slate-400 mt-1">Sin mensualidades de plataforma</p>
+          </div>
+
+          <div class="border-t border-slate-700/60 pt-4 space-y-2.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-turquesa"></i> Plataforma completa con todas las funciones</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-turquesa"></i> Cesión de derechos patrimoniales a Scroll</div>
+            <div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-scroll-turquesa"></i> Entrega de código fuente y repositorio</div>
+            <div class="flex items-center gap-2 text-slate-400"><i data-lucide="minus" class="w-4 h-4"></i> Servidor y hosting corre por cuenta de Scroll</div>
+            <div class="flex items-center gap-2 text-slate-400"><i data-lucide="minus" class="w-4 h-4"></i> Soporte futuro se cotiza por horas</div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-700/40">
+          <p class="text-[11px] text-slate-400">Ideal si Scroll busca valorizar la empresa teniendo activos de software propios.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INTERACTIVE ROI CALCULATOR FOR SCROLL -->
+  <section id="roi" class="py-16 px-6 max-w-5xl mx-auto">
+    <div class="glass-card p-8 sm:p-10 rounded-3xl border border-scroll-lima/30 relative">
+      <div class="max-w-2xl">
+        <span class="text-scroll-lima text-xs font-bold uppercase tracking-widest font-display">• La Matemática de Negocio •</span>
+        <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-white mt-1">
+          Calculadora de Rentabilidad para Scroll
+        </h2>
+        <p class="text-xs text-slate-300 mt-1 mb-6">
+          Si Scroll cobra planes desde <strong class="text-white">$2.000.000 COP/mes</strong> a empresas medianas, mira cuánto gana la agencia implementando el bot bajo la <strong>Opción C</strong>:
+        </p>
+      </div>
+
+      <!-- Slider input -->
+      <div class="bg-scroll-navy/60 p-6 rounded-2xl mb-8 border border-slate-700">
+        <div class="flex justify-between items-center mb-2">
+          <label for="client-slider" class="text-xs font-semibold text-slate-300">Empresas clientes activas en Scroll con Bot:</label>
+          <span id="slider-val" class="font-display font-black text-2xl text-scroll-lima">5 empresas</span>
+        </div>
+        <input type="range" id="client-slider" min="1" max="25" value="5" step="1" 
+               class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-scroll-lima">
+        <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+          <span>1 cliente piloto</span>
+          <span>10 clientes</span>
+          <span>25 clientes consolidados</span>
+        </div>
+      </div>
+
+      <!-- Live Results Grid -->
+      <div class="grid sm:grid-cols-3 gap-4 text-center">
+        <div class="bg-[#03234d] p-5 rounded-2xl border border-slate-700">
+          <p class="text-[11px] text-slate-400 uppercase font-semibold">Facturación de Scroll (Planes)</p>
+          <p id="res-ingreso" class="font-display font-extrabold text-xl sm:text-2xl text-white mt-1">$10.000.000</p>
+          <p class="text-[10px] text-slate-400 mt-1">Mensuales cobrados a clientes</p>
+        </div>
+
+        <div class="bg-[#03234d] p-5 rounded-2xl border border-slate-700">
+          <p class="text-[11px] text-slate-400 uppercase font-semibold">Costo Plataforma (Opción C)</p>
+          <p id="res-costo" class="font-display font-extrabold text-xl sm:text-2xl text-scroll-turquesaLight mt-1">$450.000</p>
+          <p class="text-[10px] text-slate-400 mt-1">Solo $90k/mes por empresa</p>
+        </div>
+
+        <div class="bg-scroll-lima/10 p-5 rounded-2xl border border-scroll-lima/40">
+          <p class="text-[11px] text-scroll-lima uppercase font-bold">Margen Bruto para Scroll</p>
+          <p id="res-margen" class="font-display font-black text-xl sm:text-2xl text-scroll-lima mt-1">$9.550.000</p>
+          <p id="res-porcentaje" class="text-[10px] text-scroll-lima mt-1 font-semibold">95.5% de Margen de Ganancia</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONBOARDING SECTION (19 HOURS BREAKDOWN) -->
+  <section id="onboarding" class="py-16 px-6 max-w-7xl mx-auto scroll-mt-20">
+    <div class="text-center mb-12">
+      <span class="text-scroll-turquesaLight text-xs font-bold uppercase tracking-widest font-display">• Implementación en Terreno •</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-2">
+        Configuración por Empresa (19 Horas)
+      </h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto mt-2">
+        El secreto para que el bot venda no es solo el código: es entender el ADN del negocio desde adentro.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <!-- 2h -->
+      <div class="glass-card p-5 rounded-2xl border-t-2 border-t-slate-500">
+        <span class="text-xs font-mono font-bold text-scroll-turquesaLight">01 / PREPARACIÓN</span>
+        <p class="font-display font-extrabold text-2xl text-white mt-1">2 Horas</p>
+        <p class="text-xs font-semibold text-slate-200 mt-1">Investigación de Marca</p>
+        <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+          Estudio de redes, competencia, productos y tono de comunicación antes de visitar al cliente.
+        </p>
+      </div>
+
+      <!-- 8h (STAR) -->
+      <div class="glass-card p-5 rounded-2xl border-2 border-scroll-lima bg-scroll-lima/5 relative">
+        <span class="bg-scroll-lima text-scroll-navy text-[9px] font-black uppercase px-2 py-0.5 rounded-full absolute -top-2.5 right-3">El Diferenciador</span>
+        <span class="text-xs font-mono font-bold text-scroll-lima">02 / IN SITU</span>
+        <p class="font-display font-extrabold text-2xl text-scroll-lima mt-1">8 Horas</p>
+        <p class="text-xs font-bold text-white mt-1">Jornada Presencial Completa</p>
+        <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+          Santiago se sienta con los vendedores reales de la empresa a vivir el día a día para mapear objeciones y cierres.
+        </p>
+      </div>
+
+      <!-- 3h -->
+      <div class="glass-card p-5 rounded-2xl border-t-2 border-t-slate-500">
+        <span class="text-xs font-mono font-bold text-scroll-turquesaLight">03 / CÓDIGO</span>
+        <p class="font-display font-extrabold text-2xl text-white mt-1">3 Horas</p>
+        <p class="text-xs font-semibold text-slate-200 mt-1">Configuración Beta</p>
+        <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+          Ingeniería de prompts, carga del catálogo oficial, reglas de filtro y pruebas de estrés del bot.
+        </p>
+      </div>
+
+      <!-- 2h -->
+      <div class="glass-card p-5 rounded-2xl border-t-2 border-t-slate-500">
+        <span class="text-xs font-mono font-bold text-scroll-turquesaLight">04 / PEDAGOGÍA</span>
+        <p class="font-display font-extrabold text-2xl text-white mt-1">2 Horas</p>
+        <p class="text-xs font-semibold text-slate-200 mt-1">Preparación Docente</p>
+        <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+          Diseño del material y guía rápida para que el equipo humano aprenda a recibir los leads calificados.
+        </p>
+      </div>
+
+      <!-- 4h -->
+      <div class="glass-card p-5 rounded-2xl border-t-2 border-t-slate-500 sm:col-span-2 lg:col-span-1">
+        <span class="text-xs font-mono font-bold text-scroll-turquesaLight">05 / ENTREGA</span>
+        <p class="font-display font-extrabold text-2xl text-white mt-1">4 Horas</p>
+        <p class="text-xs font-semibold text-slate-200 mt-1">Capacitación en Vivo</p>
+        <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+          Sesión de entrenamiento directo con el personal para resolver dudas y asegurar que adopten la herramienta.
+        </p>
+      </div>
+    </div>
+
+    <!-- Onboarding Price Card -->
+    <div class="glass-card p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 border-l-4 border-l-scroll-lima">
+      <div>
+        <h3 class="font-display font-bold text-lg text-white">Tarifa por Empresa Nueva: $160.000 COP</h3>
+        <p class="text-xs text-slate-300 mt-0.5">
+          Calculado a <strong>$8.338 COP/hora</strong> (tarifa mínima legal 2026, jornada 42h) × 19 horas = $158.422 (aprox. $160.000).
+        </p>
+        <p class="text-[11px] text-slate-400 mt-1">
+          ★ Incluye <strong>1 semana de ajustes post-lanzamiento</strong> para garantizar que quede rodando perfecto.
+        </p>
+      </div>
+      <div class="text-right shrink-0">
+        <span class="text-[11px] text-slate-400 block">Sugerencia con carga completa:</span>
+        <span class="text-xs font-semibold text-scroll-turquesaLight">$240.000 COP / empresa</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAYMENT METHODS (THE 3 OPTIONS) -->
+  <section class="py-16 px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-10">
+      <span class="text-scroll-lima text-xs font-bold uppercase tracking-widest font-display">• Flexibilidad Financiera •</span>
+      <h2 class="font-display font-extrabold text-3xl text-white mt-2">
+        Modalidades de Pago de la Plataforma
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <!-- Pay 1 -->
+      <div class="glass-card p-6 rounded-2xl border-t-2 border-t-scroll-lima">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase text-scroll-lima">Opción 1</span>
+          <span class="text-[10px] bg-scroll-lima/20 text-scroll-lima font-bold px-2 py-0.5 rounded-full">Prioritaria</span>
+        </div>
+        <h4 class="font-display font-bold text-base text-white">De Contado — Fast-Track</h4>
+        <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+          Pago 100% al inicio. Le da máxima prioridad al proyecto en agenda y <strong>acorta el tiempo de entrega de 8 a 6 semanas</strong>.
+        </p>
+      </div>
+
+      <!-- Pay 2 -->
+      <div class="glass-card p-6 rounded-2xl border-t-2 border-t-slate-500">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase text-slate-400">Opción 2</span>
+          <span class="text-[10px] bg-slate-700 text-slate-300 font-semibold px-2 py-0.5 rounded-full">Por Hitos</span>
+        </div>
+        <h4 class="font-display font-bold text-base text-white">3 Cuotas Iguales</h4>
+        <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+          1/3 al iniciar · 1/3 con la Demo Funcional en la semana 4 · 1/3 contra entrega final probada en la semana 8.
+        </p>
+      </div>
+
+      <!-- Pay 3 -->
+      <div class="glass-card p-6 rounded-2xl border-t-2 border-t-slate-500">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase text-slate-400">Opción 3</span>
+          <span class="text-[10px] bg-slate-700 text-slate-300 font-semibold px-2 py-0.5 rounded-full">Tradicional</span>
+        </div>
+        <h4 class="font-display font-bold text-base text-white">40% / 60%</h4>
+        <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+          40% inicial para arrancar desarrollo y arquitectura · 60% al finalizar el Mes 2 (antes de entrar a fase Beta).
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNICAL HONESTY & TRANSPARENCY -->
+  <section class="py-12 px-6 max-w-5xl mx-auto">
+    <div class="glass-card p-8 rounded-3xl border border-slate-700">
+      <div class="flex items-center gap-3 mb-4">
+        <i data-lucide="shield-alert" class="w-6 h-6 text-scroll-lima"></i>
+        <h3 class="font-display font-bold text-lg text-white">Claridad Técnica y Escalabilidad</h3>
+      </div>
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+        <p>
+          • <strong>Conexión Inicial:</strong> Arrancamos con la tecnología que ya dominamos en ServirPlus (<code class="text-scroll-turquesaLight">whatsapp-web.js</code>). Esto permite que el cliente empiece a vender en minutos escaneando un código QR desde el celular que ya tiene en su mostrador, sin esperar semanas de verificación corporativa de Meta.
+        </p>
+        <p>
+          • <strong>Ruta de Crecimiento:</strong> A medida que la cartera de clientes de Scroll crezca, la plataforma estará lista para conectarse a la <strong>API Oficial de Meta (Cloud API)</strong> como una fase de expansión, garantizando blindaje total contra restricciones.
+        </p>
+        <p>
+          • <strong>Consumos de IA:</strong> Scroll le cobra al cliente el costo exacto de tokens según el reporte del medidor integrado, asegurando que el margen de la agencia nunca se vea afectado.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING / CALL TO ACTION -->
+  <footer id="contacto" class="py-20 px-6 max-w-7xl mx-auto text-center border-t border-slate-800">
+    <span class="font-script text-3xl sm:text-4xl text-scroll-lima block mb-2">
+      ¡Trabajemos juntos!
+    </span>
+    <h2 class="font-display font-black text-4xl sm:text-5xl text-white tracking-tight mb-4">
+      Hagamos que Scroll lidere la innovación en la región.
+    </h2>
+    <p class="text-slate-400 text-sm max-w-xl mx-auto mb-8">
+      Propuesta preparada por <strong>Santiago Guerra</strong> para Scroll Agencia de Marketing Digital.
+    </p>
+
+    <div class="flex flex-wrap justify-center items-center gap-4">
+      <a href="https://wa.me/573104252540?text=Hola%20Santiago,%20revisé%20la%20propuesta%20de%20Scroll%20y%20quiero%20que%20definamos%20detalles" 
+         target="_blank" 
+         class="px-8 py-4 rounded-xl font-display font-bold text-sm bg-scroll-lima text-scroll-navy hover:bg-scroll-limaHover transition glow-lima flex items-center gap-2">
+        <i data-lucide="message-circle" class="w-4 h-4"></i>
+        <span>Iniciar Conversación por WhatsApp</span>
+      </a>
+      <button onclick="window.print()" class="px-6 py-4 rounded-xl font-display font-bold text-sm glass-card text-white hover:border-scroll-turquesa transition flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4 text-scroll-turquesaLight"></i>
+        <span>Guardar en PDF</span>
+      </button>
+    </div>
+
+    <div class="mt-16 text-slate-500 text-[11px]">
+      Scroll Agencia © 2026 • Transformación Digital • Pereira, Colombia
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT: SIMULATOR & ROI LOGIC -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // ----------------------------------------------------------------
+    // 1. WHATSAPP SIMULATOR ENGINE
+    // ----------------------------------------------------------------
+    const chatContainer = document.getElementById('chat-messages');
+    const typingIndicator = document.getElementById('chat-typing');
+    const simStatus = document.getElementById('sim-status');
+
+    let currentStep = 0;
+
+    const conversationScript = [
+      {
+        step: 1,
+        sender: 'lead',
+        text: '¡Hola! Vi el anuncio en Instagram de los servicios de asesoría y quiero más información por favor 👋',
+        time: '10:42 AM',
+        statusText: 'Lead ingresó por anuncio'
+      },
+      {
+        step: 2,
+        sender: 'bot',
+        text: '¡Hola! Qué gusto saludarte 🚀 Bienvenido/a a nuestra atención rápida.\n\nContamos con 2 soluciones principales:\n1️⃣ Asesoría Comercial Especializada\n2️⃣ Auditoría de Procesos Digitales\n\n¿Cuál de estas dos se ajusta más a tu negocio?',
+        time: '10:42 AM',
+        statusText: 'Respuesta en 3 seg'
+      },
+      {
+        step: 3,
+        sender: 'lead',
+        text: 'La Asesoría Comercial Especializada. Tenemos 15 empleados y necesitamos cerrar clientes más rápido. ¿Cuánto cuesta y cuándo podrían empezar?',
+        time: '10:43 AM',
+        statusText: 'Alta intención detectada'
+      },
+      {
+        step: 4,
+        sender: 'bot',
+        text: 'Excelente. Para empresas de tu tamaño el plan arranca desde $2.5M COP con acompañamiento directo.\n\n🔥 *Lead Calificado Detectado*\nTe estoy comunicando de inmediato con Carlos, nuestro director comercial, para coordinar la llamada esta misma tarde.',
+        time: '10:43 AM',
+        badge: '🔥 LEAD PRIORITARIO - TRANSFERIDO A HUMANO',
+        statusText: '¡Lead listo para cerrar venta!'
+      }
+    ];
+
+    function appendMessage(msg) {
+      const bubble = document.createElement('div');
+      bubble.className = msg.sender === 'lead' ? 'flex justify-end' : 'flex justify-start';
+
+      const isBot = msg.sender === 'bot';
+      const bubbleBg = isBot ? 'wa-bubble-in text-slate-100' : 'wa-bubble-out text-white';
+
+      let innerContent = `
+        <div class="max-w-[85%] p-2.5 ${bubbleBg} relative group animate-fade-in text-[11px] leading-relaxed">
+          ${msg.badge ? `<div class="bg-scroll-lima text-scroll-navy text-[9px] font-black uppercase px-2 py-0.5 rounded mb-1.5 flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> ${msg.badge}</div>` : ''}
+          <p class="whitespace-pre-line">${msg.text}</p>
+          <div class="text-[9px] text-slate-400 text-right mt-1 flex items-center justify-end gap-1 font-mono">
+            <span>${msg.time}</span>
+            ${!isBot ? '<i data-lucide="check-check" class="w-3 h-3 text-scroll-turquesaLight"></i>' : ''}
+          </div>
+        </div>
+      `;
+
+      bubble.innerHTML = innerContent;
+      chatContainer.appendChild(bubble);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function triggerSimStep(stepNum) {
+      if (stepNum <= currentStep) return;
+
+      const stepData = conversationScript.find(s => s.step === stepNum);
+      if (!stepData) return;
+
+      // Update button active state
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`btn-step-${i}`);
+        if (i === stepNum) {
+          btn.classList.add('border-scroll-lima', 'bg-scroll-navy');
+        }
+      }
+
+      // Show typing if bot
+      if (stepData.sender === 'bot') {
+        typingIndicator.classList.remove('hidden');
+        simStatus.innerText = 'Escribiendo...';
+        setTimeout(() => {
+          typingIndicator.classList.add('hidden');
+          appendMessage(stepData);
+          currentStep = stepNum;
+          simStatus.innerText = stepData.statusText;
+        }, 800);
+      } else {
+        appendMessage(stepData);
+        currentStep = stepNum;
+        simStatus.innerText = stepData.statusText;
+      }
+    }
+
+    function resetSimulator() {
+      chatContainer.innerHTML = `
+        <div class="text-center my-1">
+          <span class="bg-[#182229] text-slate-400 text-[9px] px-2.5 py-1 rounded-md shadow-sm">
+            Mensaje iniciado desde anuncio de Instagram
+          </span>
+        </div>
+      `;
+      currentStep = 0;
+      simStatus.innerText = 'Listo';
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`btn-step-${i}`);
+        btn.classList.remove('border-scroll-lima');
+      }
+    }
+
+    // Auto run step 1 after 1 second
+    setTimeout(() => {
+      triggerSimStep(1);
+    }, 1200);
+
+
+    // ----------------------------------------------------------------
+    // 2. INTERACTIVE ROI CALCULATOR
+    // ----------------------------------------------------------------
+    const slider = document.getElementById('client-slider');
+    const sliderVal = document.getElementById('slider-val');
+    const resIngreso = document.getElementById('res-ingreso');
+    const resCosto = document.getElementById('res-costo');
+    const resMargen = document.getElementById('res-margen');
+    const resPorcentaje = document.getElementById('res-porcentaje');
+
+    function updateROI() {
+      const clients = parseInt(slider.value, 10);
+      sliderVal.innerText = `${clients} ${clients === 1 ? 'empresa' : 'empresas'}`;
+
+      const ingresoTotal = clients * 2000000;
+      const costoTotal = clients * 90000;
+      const margenNeto = ingresoTotal - costoTotal;
+      const pct = ((margenNeto / ingresoTotal) * 100).toFixed(1);
+
+      resIngreso.innerText = `$${ingresoTotal.toLocaleString('es-CO')}`;
+      resCosto.innerText = `$${costoTotal.toLocaleString('es-CO')}`;
+      resMargen.innerText = `$${margenNeto.toLocaleString('es-CO')}`;
+      resPorcentaje.innerText = `${pct}% de Margen para Scroll`;
+    }
+
+    slider.addEventListener('input', updateROI);
+    updateROI();
+  </script>
+</body>
+</html>
