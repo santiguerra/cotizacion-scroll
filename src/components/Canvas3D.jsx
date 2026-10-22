@@ -1,6 +1,6 @@
 import React, { useRef, useMemo } from 'react';
 import * as THREE from 'three';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import {
   Html,
   Float,
@@ -58,10 +58,8 @@ function HeroSmartphoneRig() {
   const phoneGroupRef = useRef();
   const ringWave1Ref = useRef();
   const ringWave2Ref = useRef();
-
-  const [logoSeparation, setLogoSeparation] = React.useState(0);
-  const [orbitOffset, setOrbitOffset] = React.useState([0, 0, 0]);
-  const [orbitRot, setOrbitRot] = React.useState([0, 0, 0]);
+  const logoWrapperRef = useRef();
+  const screenMaterialRef = useRef();
   const [heroProgress, setHeroProgress] = React.useState(0);
 
   useFrame((state) => {
@@ -74,8 +72,12 @@ function HeroSmartphoneRig() {
       rootRef.current.visible = p < 0.95 && Boolean(rect && rect.bottom > 40);
     }
 
-    if (Math.abs(p - heroProgress) > 0.004) {
+    if (Math.abs(p - heroProgress) > 0.05) {
       setHeroProgress(p);
+    }
+
+    if (screenMaterialRef.current) {
+      screenMaterialRef.current.emissiveIntensity = 0.75 + p * 1.4;
     }
 
     if (phoneGroupRef.current) {
@@ -110,13 +112,14 @@ function HeroSmartphoneRig() {
     const ox = Math.sin(angle) * outCurve * 0.75;
     const oy = Math.cos(angle) * outCurve * 0.42;
 
-    setLogoSeparation(sepZ);
-    setOrbitOffset([ox, oy, 0]);
-    setOrbitRot([
-      Math.sin(p * Math.PI) * 0.35,
-      Math.sin(p * Math.PI * 2) * 0.55,
-      p * Math.PI * 0.25,
-    ]);
+    if (logoWrapperRef.current) {
+      logoWrapperRef.current.position.set(ox, 0.08 + oy, 0.15 + sepZ);
+      logoWrapperRef.current.rotation.set(
+        Math.sin(p * Math.PI) * 0.35,
+        Math.sin(p * Math.PI * 2) * 0.55,
+        p * Math.PI * 0.25
+      );
+    }
   });
 
   return (
@@ -157,9 +160,10 @@ function HeroSmartphoneRig() {
           position={[0, 0, 0.11]}
         >
           <meshPhysicalMaterial
+            ref={screenMaterialRef}
             color="#021836"
             emissive="#033369"
-            emissiveIntensity={0.75 + heroProgress * 1.4}
+            emissiveIntensity={0.75}
             roughness={0.1}
             metalness={0.1}
             clearcoat={1}
@@ -179,14 +183,14 @@ function HeroSmartphoneRig() {
           <meshBasicMaterial color="#000000" />
         </RoundedBox>
 
-        <group position={[0, 0.08, 0.15]}>
+        <group ref={logoWrapperRef} position={[0, 0.08, 0.15]}>
           <ScrollLogo3D
-            separationZ={logoSeparation}
-            orbitOffset={orbitOffset}
-            orbitRotation={orbitRot}
+            separationZ={0}
+            orbitOffset={[0, 0, 0]}
+            orbitRotation={[0, 0, 0]}
             showPlinth={true}
             scale={0.78}
-            glowIntensity={0.55 + heroProgress * 0.8}
+            glowIntensity={0.75}
           />
         </group>
       </group>
@@ -538,7 +542,52 @@ function CrossoverEncounterRig() {
 function ClimaxQRRig() {
   const stageGroupRef = useRef();
   const qrGroupRef = useRef();
-  const qrTexture = useLoader(THREE.TextureLoader, '/qr_metalevel.png');
+  
+  const qrTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillStyle = '#01122a';
+    ctx.fillRect(20, 20, 80, 80);
+    ctx.fillRect(156, 20, 80, 80);
+    ctx.fillRect(20, 156, 80, 80);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(36, 36, 48, 48);
+    ctx.fillRect(172, 36, 48, 48);
+    ctx.fillRect(36, 172, 48, 48);
+    ctx.fillStyle = '#AEF905';
+    ctx.fillRect(48, 48, 24, 24);
+    ctx.fillRect(184, 48, 24, 24);
+    ctx.fillRect(48, 184, 24, 24);
+    ctx.fillStyle = '#01122a';
+    ctx.fillRect(116, 116, 24, 24);
+    ctx.fillRect(116, 40, 24, 24);
+    ctx.fillRect(40, 116, 24, 24);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    
+    try {
+      const basePath = (import.meta.env.BASE_URL || './').replace(/\/$/, '') + '/';
+      const loader = new THREE.TextureLoader();
+      loader.load(
+        `${basePath}qr_metalevel.png`,
+        (loaded) => {
+          tex.image = loaded.image;
+          tex.needsUpdate = true;
+        },
+        undefined,
+        (err) => {
+          console.warn('QR texture fallback active:', err);
+        }
+      );
+    } catch (e) {
+      console.warn('Texture loader init error:', e);
+    }
+    return tex;
+  }, []);
 
   useFrame((state) => {
     const vis = syncRigToDOMStage(stageGroupRef, 'stage-qr', state, 0);
@@ -693,13 +742,18 @@ function SceneCameraDirector() {
 class R3FErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
   }
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("3D Rig caught an error:", error, errorInfo);
   }
   render() {
-    if (this.state.hasError) return null;
+    if (this.state.hasError) {
+      return this.props.fallback !== undefined ? this.props.fallback : null;
+    }
     return this.props.children;
   }
 }
@@ -726,6 +780,7 @@ export default function Canvas3D() {
             antialias: true,
             alpha: true,
             preserveDrawingBuffer: true,
+            powerPreference: 'high-performance',
           }}
         >
           <SceneCameraDirector />
@@ -741,21 +796,29 @@ export default function Canvas3D() {
           />
 
           {/* 1. Hero Smartphone + Detaching 3D Scroll Logo + Marketing Props */}
-          <HeroSmartphoneRig />
+          <R3FErrorBoundary>
+            <HeroSmartphoneRig />
+          </R3FErrorBoundary>
 
           {/* 2. El Iceberg 3D + Drei <Html> Floating Pills (Locked to #stage-iceberg) */}
-          <IcebergSectionRig />
+          <R3FErrorBoundary>
+            <IcebergSectionRig />
+          </R3FErrorBoundary>
 
           {/* 3. Tu Propio Software SaaS 3D Node Cluster (Locked to #stage-saas) */}
-          <SaaSClusterRig />
+          <R3FErrorBoundary>
+            <SaaSClusterRig />
+          </R3FErrorBoundary>
 
           {/* 5. Casos de Éxito & Crossover MetaLevelCode 3D Logos + Shockwave (Locked to #stage-crossover) */}
-          <CrossoverEncounterRig />
+          <R3FErrorBoundary>
+            <CrossoverEncounterRig />
+          </R3FErrorBoundary>
 
           {/* 7. Trabajemos Juntos 3D Floating QR Monolith (Locked to #stage-qr) */}
-          <React.Suspense fallback={null}>
+          <R3FErrorBoundary>
             <ClimaxQRRig />
-          </React.Suspense>
+          </R3FErrorBoundary>
         </Canvas>
       </R3FErrorBoundary>
     </div>

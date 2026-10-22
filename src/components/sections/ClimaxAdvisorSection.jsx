@@ -118,7 +118,7 @@ export default function ClimaxAdvisorSection() {
         botReply.text =
           'Mira esta joya: la Cocina Gourmet de Casa Tradición tiene isla central en piedra sinterizada y se conecta directo con el deck de la piscina para reuniones.\n\n¿Para cuántas personas estás buscando espacio en tu nueva casa?';
         botReply.photos = [
-          { url: '/assets_casa/cocina_gourmet.jpg', caption: 'Cocina Gourmet • Isla Central' },
+          { url: `${import.meta.env.BASE_URL}assets_casa/cocina_gourmet.jpg`, caption: 'Cocina Gourmet • Isla Central' },
         ];
       } else if (lower.includes('sala')) {
         botReply.thought =
@@ -126,7 +126,7 @@ export default function ClimaxAdvisorSection() {
         botReply.text =
           'Aquí tienes la Sala Principal de doble altura: ventanales piso a techo que mantienen la casa fresca todo el día con vista a la reserva de Cerritos.\n\n¿Te gustaría ver ahora la fachada y piscina, o revisamos medidas, estrato y precio?';
         botReply.photos = [
-          { url: '/assets_casa/sala_principal.jpg', caption: 'Sala Doble Altura • Vista Reserva' },
+          { url: `${import.meta.env.BASE_URL}assets_casa/sala_principal.jpg`, caption: 'Sala Doble Altura • Vista Reserva' },
         ];
       } else if (lower.includes('fachada') || lower.includes('piscina') || lower.includes('foto')) {
         botReply.thought =
@@ -134,8 +134,8 @@ export default function ClimaxAdvisorSection() {
         botReply.text =
           'Te comparto la Fachada Arquitectónica y la Terraza con Piscina Sinfín climatizada. En persona la vista al atardecer de Cerritos enamora.\n\n¿Te gustaría conocer el precio, medidas y administración, o agendamos tu visita privada esta semana?';
         botReply.photos = [
-          { url: '/assets_casa/fachada_casa.jpg', caption: 'Fachada Principal Contemporánea' },
-          { url: '/assets_casa/terraza_piscina.jpg', caption: 'Piscina Sinfín Climatizada' },
+          { url: `${import.meta.env.BASE_URL}assets_casa/fachada_casa.jpg`, caption: 'Fachada Principal Contemporánea' },
+          { url: `${import.meta.env.BASE_URL}assets_casa/terraza_piscina.jpg`, caption: 'Piscina Sinfín Climatizada' },
         ];
       } else if (
         lower.includes('visita') ||
