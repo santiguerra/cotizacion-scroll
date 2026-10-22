@@ -1,0 +1,2821 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth bg-[#01122a] text-[#f1f5f9]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll — Plataforma de Asesores de Ventas con IA para WhatsApp | Propuesta Comercial</title>
+
+  <!-- Google Fonts: Montserrat (Display), Poppins (Body), Kaushan Script (Acentos Scroll) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:ital,wght@0,600;0,700;0,800;0,900;1,700;1,900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons (Pinned & Hardened) -->
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
+
+  <!-- GSAP 3 & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            scroll: {
+              navy: '#01122a',
+              dark: '#031b3d',
+              blue: '#033369',
+              deep: '#022751',
+              petroleo: '#043E71',
+              turquesa: '#02CCB5',
+              turquesaLight: '#02E7C1',
+              lima: '#AEF905',
+              limaHover: '#98dc03',
+              papel: '#F5F4F3',
+              tinta: '#1E2B8C'
+            }
+          },
+          fontFamily: {
+            display: ['Montserrat', 'sans-serif'],
+            body: ['Poppins', 'sans-serif'],
+            script: ['Kaushan Script', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-dark: #01122a;
+      --scroll-grad: linear-gradient(135deg, #043E71 0%, #036A86 40%, #02CCB5 80%, #02E7C1 100%);
+      --border-turquesa: rgba(2, 204, 181, 0.22);
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #f1f5f9;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    section {
+      scroll-margin-top: 3rem;
+    }
+
+    /* Ambient Live GPU Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      transform: translateZ(0);
+    }
+
+    /* Subtle Film Grain */
+    .film-grain {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Gradient Shimmers */
+    .text-gradient-scroll {
+      background: linear-gradient(135deg, #FFFFFF 15%, #02E7C1 60%, #AEF905 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .text-gradient-turquesa {
+      background: linear-gradient(135deg, #02E7C1 0%, #02CCB5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Luxury Bezel Chassis (Casa Tradición Style) */
+    .bezel-chassis {
+      background: linear-gradient(145deg, rgba(3, 27, 61, 0.88) 0%, rgba(1, 18, 42, 0.95) 100%);
+      border: 1px solid rgba(2, 204, 181, 0.22);
+      border-radius: 1.5rem;
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+      transform: translateZ(0);
+    }
+    .bezel-chassis:hover {
+      border-color: rgba(174, 249, 5, 0.45);
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.85), 0 0 24px rgba(2, 204, 181, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+    }
+
+    /* ==========================================================================
+       VANILLA INTERSECTION OBSERVER SCROLL REVEAL (OPACITY 0->1, SLIDE UP 30px)
+       ========================================================================== */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      will-change: opacity, transform;
+    }
+
+    .reveal-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       PHONE INCOMING CALL RINGING ANIMATION & 3D HOVER
+       ========================================================================== */
+    @keyframes phoneIncomingRing {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      15% { transform: translateY(-3px) rotate(-1deg); }
+      30% { transform: translateY(3px) rotate(1deg); }
+      45% { transform: translateY(-2px) rotate(-0.6deg); }
+      60% { transform: translateY(2px) rotate(0.6deg); }
+      75% { transform: translateY(-1px) rotate(-0.3deg); }
+      90% { transform: translateY(1px) rotate(0.3deg); }
+    }
+    .phone-ringing-vibe {
+      animation: phoneIncomingRing 2.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+    }
+
+    /* ==========================================================================
+       CINEMATIC CHAPTER TRANSITION PORTALS (EXPERIENCIA CONTINUA ENTRE SECCIONES)
+       ========================================================================== */
+    .chapter-transition-portal {
+      position: relative;
+      padding: 3rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      user-select: none;
+    }
+    .portal-line-in {
+      width: 2px;
+      height: 48px;
+      background: linear-gradient(180deg, transparent, rgba(2, 231, 193, 0.8), #AEF905);
+      border-radius: 9999px;
+      box-shadow: 0 0 16px rgba(2, 231, 193, 0.6);
+      transform-origin: top;
+    }
+    .portal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 9999px;
+      background: rgba(1, 20, 40, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(2, 231, 193, 0.4);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(2, 231, 193, 0.2);
+      margin: 0.75rem 0;
+      transition: all 0.4s ease;
+    }
+    .portal-badge:hover {
+      border-color: #AEF905;
+      box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(174, 249, 5, 0.35);
+      transform: translateY(-2px);
+    }
+    .portal-radar {
+      position: relative;
+      display: flex;
+      width: 10px;
+      height: 10px;
+    }
+    .portal-radar-ping {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-color: #AEF905;
+      opacity: 0.75;
+      animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .portal-radar-core {
+      position: relative;
+      display: inline-flex;
+      border-radius: 9999px;
+      width: 10px;
+      height: 10px;
+      background-color: #AEF905;
+    }
+    .portal-tag {
+      font-size: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #66FFE3;
+    }
+    .portal-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      padding-left: 0.75rem;
+    }
+    .portal-icon {
+      width: 14px;
+      height: 14px;
+      color: #AEF905;
+      animation: bounce 2s infinite;
+    }
+    .portal-line-out {
+      width: 2px;
+      height: 48px;
+      background: linear-gradient(180deg, #AEF905, rgba(2, 231, 193, 0.8), transparent);
+      border-radius: 9999px;
+      box-shadow: 0 0 16px rgba(174, 249, 5, 0.6);
+      transform-origin: bottom;
+    }
+
+    /* SaaS Device Text Smooth Morph Container */
+    #device-screen-inner {
+      will-change: transform, opacity;
+    }
+
+    /* Magnetic Primary Button */
+    .btn-luxury-magnetic {
+      background: linear-gradient(135deg, #AEF905 0%, #98DC03 100%);
+      color: #01122a;
+      font-weight: 800;
+      border-radius: 9999px;
+      padding: 0.85rem 1.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      box-shadow: 0 10px 25px -5px rgba(174, 249, 5, 0.4);
+      transform: translateZ(0);
+    }
+    .btn-luxury-magnetic:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 16px 32px -5px rgba(174, 249, 5, 0.6);
+    }
+    .btn-luxury-magnetic .icon-bubble {
+      width: 1.85rem;
+      height: 1.85rem;
+      border-radius: 9999px;
+      background: rgba(1, 18, 42, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease;
+    }
+    .btn-luxury-magnetic:hover .icon-bubble {
+      transform: translateX(3px);
+    }
+
+    /* Custom Precision Cursor */
+    #custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid rgba(2, 204, 181, 0.7);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate3d(-100px, -100px, 0);
+      transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
+      will-change: transform;
+    }
+    #custom-cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      background-color: #AEF905;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate3d(-100px, -100px, 0);
+      will-change: transform;
+    }
+
+    /* 3D Calling Logo Floating & Ringing Animations */
+    @keyframes logo-3d-idle {
+      0%, 100% {
+        transform: rotateY(-8deg) rotateX(6deg) translateY(0px);
+      }
+      50% {
+        transform: rotateY(8deg) rotateX(-4deg) translateY(-6px);
+      }
+    }
+
+    @keyframes call-ripple {
+      0% { transform: scale(0.85); opacity: 0.9; }
+      50% { transform: scale(1.4); opacity: 0.4; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
+
+    .animate-call-ripple-1 {
+      animation: call-ripple 2.4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    }
+    .animate-call-ripple-2 {
+      animation: call-ripple 2.4s cubic-bezier(0, 0.2, 0.8, 1) 0.8s infinite;
+    }
+    .animate-call-ripple-3 {
+      animation: call-ripple 2.4s cubic-bezier(0, 0.2, 0.8, 1) 1.6s infinite;
+    }
+
+    .logo-3d-floating {
+      transform-style: preserve-3d;
+      animation: logo-3d-idle 5s ease-in-out infinite;
+    }
+
+    /* Phone Mockups */
+    .phone-mockup {
+      border-radius: 36px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(2, 204, 181, 0.12);
+      border: 1px solid rgba(2, 204, 181, 0.25);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .phone-mockup:hover {
+      transform: translateY(-5px);
+      border-color: rgba(174, 249, 5, 0.5);
+      box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(174, 249, 5, 0.2);
+    }
+
+    /* Range slider custom styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #033369;
+      border-radius: 9999px;
+      height: 8px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #AEF905;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(174, 249, 5, 0.8);
+      border: 2px solid #01122a;
+    }
+
+    /* Typing Animation */
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .typing-dot-1 { animation: typing 1.4s infinite 0s; }
+    .typing-dot-2 { animation: typing 1.4s infinite 0.2s; }
+    .typing-dot-3 { animation: typing 1.4s infinite 0.4s; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: #01122a; }
+    ::-webkit-scrollbar-thumb {
+      background: #033369;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #02CCB5; }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #01122a !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .bezel-chassis, .phone-mockup {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+      }
+      .text-gradient-scroll, .text-gradient-turquesa {
+        -webkit-text-fill-color: #033369 !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-scroll-lima selection:text-scroll-navy relative">
+
+  <!-- Ambient Live GPU Canvas (Scroll Volumetric Orbs & Embers) -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Film Grain Overlay -->
+  <div class="film-grain"></div>
+
+  <!-- Custom Magnetic Cursor -->
+  <div id="custom-cursor" class="hidden md:block"></div>
+  <div id="custom-cursor-dot" class="hidden md:block"></div>
+
+  <!-- Fullscreen Portal Flash for Scroll Zoom-In Transition -->
+  <div id="dive-portal-curtain" class="fixed inset-0 pointer-events-none z-40 opacity-0 bg-gradient-to-b from-scroll-turquesa/30 via-scroll-petroleo/70 to-[#01122a] backdrop-blur-md"></div>
+
+  <!-- Main Content Layer -->
+  <div class="relative z-10 w-full overflow-x-clip">
+
+
+    <!-- ============================================================== -->
+    <!-- PINNED HERO: WRAPPER PARA SCROLL INMERSIVO CON STICKY NATIVO GPU -->
+    <!-- ============================================================== -->
+    <div id="hero-pin-wrapper" class="relative w-full" style="height: 190vh;">
+      <section id="hero-stage" class="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden perspective-[1200px] z-20 bg-[#01122a]">
+      
+      <!-- Stage Ambient Background Orbs -->
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-[450px] h-[450px] bg-scroll-petroleo/30 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-scroll-turquesa/20 rounded-full blur-[120px]"></div>
+      </div>
+
+      <!-- 3-COLUMNS HERO GRID: INFO IZQUIERDA | CELULAR CENTRADO | INFO DERECHA -->
+      <!-- VISTA MÓVIL (< lg): TITULAR COMPACTO Y ELEGANTE SOBRE EL CELULAR -->
+      <div id="hero-mobile-header" class="lg:hidden absolute top-12 inset-x-0 px-4 text-center z-30 pointer-events-none flex flex-col items-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bezel-chassis border border-scroll-turquesa/40 shadow-lg mb-2">
+          <span class="w-2 h-2 rounded-full bg-scroll-lima animate-ping"></span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-scroll-turquesaLight font-display">Propuesta Estratégica 2026</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-display font-black tracking-tight text-white leading-tight">
+          Scroll: <span class="text-gradient-scroll font-script font-bold normal-case text-2xl sm:text-3xl">Máquina de Ventas</span>
+        </h1>
+        <p class="text-[11px] text-slate-300 mt-1 max-w-xs">
+          Desliza hacia abajo para iniciar la inmersión en la propuesta
+        </p>
+      </div>
+
+      <!-- 3-COLUMNS HERO GRID: INFO IZQUIERDA | CELULAR CENTRADO | INFO DERECHA -->
+      <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full hidden lg:flex items-center justify-between relative z-20">
+        
+        <!-- COLUMNA IZQUIERDA: MENSAJE ESTRATÉGICO & PROPUESTA DE VALOR -->
+        <div id="hero-left-col" class="w-full lg:w-4/12 text-left space-y-4 pointer-events-auto">
+          
+          <!-- Micro-Badge Superior -->
+          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bezel-chassis border border-scroll-turquesa/40 shadow-xl">
+            <span class="w-2.5 h-2.5 rounded-full bg-scroll-lima animate-ping"></span>
+            <span class="text-[11px] font-bold uppercase tracking-widest text-scroll-turquesaLight font-display">Propuesta Estratégica 2026</span>
+          </div>
+
+          <!-- Titular Monumental -->
+          <h1 class="text-2xl sm:text-4xl lg:text-4.5xl font-display font-black tracking-tight leading-[1.12] text-white">
+            El Marketing de Scroll ya no es un gasto:
+            <br>
+            es una <span class="text-gradient-scroll font-script font-bold normal-case text-3xl sm:text-5xl lg:text-6xl tracking-normal inline-block transform -rotate-1">máquina de ventas</span>
+          </h1>
+
+          <!-- Subtítulo -->
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-md mx-auto lg:mx-0">
+            Plataforma web propia multi-empresa con marca de Scroll. Cada cliente tiene un 
+            <strong class="text-white font-semibold">Asesor con IA en WhatsApp</strong> que atiende en &lt;10s, filtra curiosos y entrega leads calificados con dinero al vendedor humano.
+          </p>
+
+          <!-- Pastillas Rápidas de Confianza -->
+          <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-2 text-[11px]">
+            <span class="px-3 py-1 rounded-full bg-scroll-blue/50 border border-scroll-turquesa/30 text-scroll-turquesaLight font-semibold">
+              ✓ 100% Multi-Empresa Aislado
+            </span>
+            <span class="px-3 py-1 rounded-full bg-scroll-blue/50 border border-scroll-lima/30 text-scroll-lima font-semibold">
+              ✓ Respuesta &lt; 10 seg 24/7
+            </span>
+            <span class="px-3 py-1 rounded-full bg-scroll-blue/50 border border-white/20 text-white font-semibold">
+              ✓ Pereira, Colombia
+            </span>
+          </div>
+
+        </div>
+
+        <!-- ESPACIADOR CENTRAL EN EL GRID PARA QUE EL CELULAR FLOTE EN EL MEDIO -->
+        <div class="hidden lg:block lg:w-4/12 pointer-events-none"></div>
+
+        <!-- COLUMNA DERECHA: PILARES CLAVE DE LA COTIZACIÓN -->
+        <div id="hero-right-col" class="w-full lg:w-4/12 space-y-3.5 text-left pointer-events-auto">
+          
+          <!-- Pilar 1 -->
+          <div class="bezel-chassis p-4 space-y-1 border-l-4 border-l-scroll-turquesa">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase font-bold text-slate-400 font-display">Arquitectura</span>
+              <i data-lucide="shield-check" class="w-4 h-4 text-scroll-turquesa"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white">100% Multi-Empresa Aislado</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Cada cliente de Scroll entra con su usuario y contraseña a su propio portal. Datos y chats totalmente privados.
+            </p>
+          </div>
+
+          <!-- Pilar 2 -->
+          <div class="bezel-chassis p-4 space-y-1 border-l-4 border-l-scroll-lima bg-scroll-lima/5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase font-bold text-scroll-lima font-display">La Firma de Scroll</span>
+              <i data-lucide="users" class="w-4 h-4 text-scroll-lima"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white">Personalización de Software</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Inmersión técnica y operativa presencial de 19 horas para parametrizar el software a la medida del negocio.
+            </p>
+          </div>
+
+          <!-- Pilar 3 -->
+          <div class="bezel-chassis p-4 space-y-1 border-l-4 border-l-scroll-turquesaLight">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase font-bold text-scroll-turquesaLight font-display">Retención Indiscutible</span>
+              <i data-lucide="trending-up" class="w-4 h-4 text-scroll-turquesaLight"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white">Demostración de ROI en Vivo</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Métricas mensuales de leads atendidos y calificados. El cliente ve el retorno en su facturación real.
+            </p>
+          </div>
+
+          <!-- Indicador de Navegación por Scroll (Sin Botones) -->
+          <div class="pt-2 text-center lg:text-left">
+            <div class="w-full py-3.5 rounded-full text-xs font-extrabold border border-scroll-lima/40 bg-scroll-lima/10 text-scroll-lima shadow-lg shadow-scroll-lima/20 flex items-center justify-center gap-2 pointer-events-none">
+              <span class="w-2 h-2 rounded-full bg-scroll-lima animate-ping"></span>
+              <span>Desliza hacia abajo para navegar la propuesta</span>
+              <i data-lucide="arrow-down" class="w-4 h-4 animate-bounce"></i>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- CENTRO ABSOLUTO: EL CELULAR (ACTOR PRINCIPAL) & LA FLECHA 3D -->
+      <!-- FLOTA EXACTAMENTE AL CENTRO DE LA PANTALLA, SIN CORTES NI BANDAS -->
+      <!-- ============================================================== -->
+      <div id="hero-center-actor-wrap" class="absolute inset-0 flex items-center justify-center pointer-events-none z-25 [transform-style:preserve-3d]">
+        
+        <!-- Smartphone Chassis -->
+        <div id="hero-phone-mockup" class="phone-ringing-vibe w-[280px] sm:w-[310px] h-[460px] sm:h-[530px] bg-[#021324] rounded-[46px] p-3 shadow-2xl border-2 border-scroll-turquesa/50 relative flex flex-col justify-between overflow-hidden shadow-scroll-turquesa/30 [transform-style:preserve-3d] transform-gpu pointer-events-auto">
+          
+          <!-- Dynamic Island / Speaker Notch -->
+          <div id="phone-notch" class="absolute top-2.5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-40 flex items-center justify-between px-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-scroll-petroleo"></span>
+            <div class="w-10 h-1 bg-white/20 rounded-full"></div>
+            <span class="w-2 h-2 rounded-full bg-scroll-lima animate-pulse"></span>
+          </div>
+
+          <!-- Phone Screen Content (Call Interface) -->
+          <div id="phone-screen-inner" class="w-full h-full rounded-[36px] bg-gradient-to-b from-[#032442] via-[#02182c] to-[#011021] flex flex-col justify-between p-5 text-center relative overflow-hidden border border-white/10">
+            
+            <!-- Background Light Glow Inside Phone -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-48 h-48 bg-scroll-turquesa/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Top Call Header -->
+            <div id="call-header" class="pt-6 z-10 transition-opacity">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-scroll-turquesaLight text-[10px] font-bold uppercase tracking-wider mb-1.5">
+                <i data-lucide="phone-call" class="w-3 h-3 text-scroll-lima animate-bounce"></i>
+                <span>WhatsApp Audio</span>
+              </div>
+              <h3 class="text-base sm:text-lg font-display font-extrabold text-white tracking-tight">
+                Scroll Asesor IA
+              </h3>
+              <p class="text-[11px] text-scroll-turquesaLight font-medium">Llamada de ventas entrante...</p>
+            </div>
+
+            <!-- Center Call Base Anchor (Plinth & Sonic Waves) -->
+            <div id="call-base-plinth" class="relative my-auto flex items-center justify-center z-10 py-3">
+              <!-- Expanding Sonic Ripple Waves -->
+              <div class="absolute w-28 h-28 rounded-full border border-scroll-lima/40 animate-ping pointer-events-none"></div>
+              <div class="absolute w-36 h-36 rounded-full border border-scroll-turquesa/30 pointer-events-none"></div>
+              <div class="absolute w-44 h-44 rounded-full border border-scroll-lima/20 pointer-events-none"></div>
+
+              <!-- Base White Disc Plinth -->
+              <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1.5 bg-gradient-to-tr from-scroll-blue via-scroll-turquesa to-scroll-lima shadow-2xl relative flex items-center justify-center border border-white/40 shadow-scroll-turquesa/40">
+                <div class="w-full h-full rounded-full bg-white flex items-center justify-center relative overflow-hidden shadow-inner">
+                  <!-- Clean pure white plinth disc bed for the arrow -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Call Indicator (100% Scroll-Driven) -->
+            <div id="call-footer" class="pb-3 z-10 space-y-2 transition-opacity">
+              <div class="px-3.5 py-1.5 rounded-full bg-scroll-petroleo/90 border border-scroll-turquesa/40 flex items-center justify-center gap-2 max-w-[210px] mx-auto shadow-lg">
+                <span class="w-2 h-2 rounded-full bg-scroll-lima animate-ping"></span>
+                <span class="text-[10px] font-bold text-scroll-turquesaLight font-mono">Llamada Entrante Activa</span>
+              </div>
+              <div class="pt-1">
+                <p class="text-[10px] text-slate-300 font-medium flex items-center justify-center gap-1.5 animate-pulse">
+                  <i data-lucide="chevrons-down" class="w-4 h-4 text-scroll-lima animate-bounce"></i>
+                  <span>Haz scroll para conectar y sumergirte</span>
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- LA FLECHA DE SCROLL COMPLETA: CUERPO CURVO AZUL + CABEZA LIMA -->
+        <!-- EL ACTOR PRINCIPAL 3D (DESPRENDIBLE) QUE SALE DE LA PANTALLA -->
+        <!-- ORBITA EL CELULAR Y SE ADENTRA EN LA PANTALLA CON NOSOTROS -->
+        <!-- ============================================================== -->
+        <div id="scroll-lime-arrow-3d" class="absolute z-50 pointer-events-none [transform-style:preserve-3d] flex items-center justify-center cursor-pointer pointer-events-auto" style="width: 120px; height: 120px;" onclick="answerCall()" title="Haz clic para contestar">
+          
+          <!-- Outer Pulsing Glow Aura -->
+          <div id="arrow-trail-glow" class="absolute inset-0 rounded-full bg-scroll-turquesa/25 blur-2xl animate-pulse"></div>
+
+          <!-- Pure Vector Authentic Scroll Emblem (Curved Blue Body + Lime Head) -->
+          <svg viewBox="0 0 150 150" class="w-full h-full drop-shadow-[0_10px_25px_rgba(1,18,42,0.45)]">
+            <defs>
+              <!-- Gradient for the blue curved body (la curvita azul / chat) -->
+              <linearGradient id="scrollBlueBodyGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+                <stop offset="0%" stop-color="#02E7C1"/>
+                <stop offset="35%" stop-color="#02CCB5"/>
+                <stop offset="70%" stop-color="#034B8C"/>
+                <stop offset="100%" stop-color="#012751"/>
+              </linearGradient>
+
+              <!-- Official Lime Arrow Head Gradient (el triángulo verde lima) -->
+              <linearGradient id="scrollLimeHeadGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#8fd300"/>
+                <stop offset="55%" stop-color="#AEF905"/>
+                <stop offset="100%" stop-color="#FFFFFF"/>
+              </linearGradient>
+
+              <!-- Neon Glow Filter for Lime Head -->
+              <filter id="scrollArrowGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#AEF905" flood-opacity="0.85"/>
+              </filter>
+            </defs>
+
+            <!-- 1. El Cuerpo Curvo de la Flecha (Curvita Azul / Chat) -->
+            <path d="
+              M 57 40.5
+              C 63 40.5 67.5 44.5 67.5 50
+              C 67.5 55 63 60 58.5 64
+              C 55.5 67 54.5 73 56.5 79
+              C 57.5 82 61 85 64.5 88.5
+              L 64 96.5
+              L 73 92
+              C 79 91.5 86 88 90.5 84.5
+              L 106 94
+              C 97.5 103 85 108.5 72.5 108.5
+              C 53.5 108.5 38 93.5 38 74.5
+              C 38 56 46.5 43.5 57 40.5 Z
+            " fill="url(#scrollBlueBodyGrad)"/>
+
+            <!-- 2. La Cabeza de la Flecha (Triángulo Verde Lima con Esquinas Redondeadas) -->
+            <path d="
+              M 87 61
+              L 108 61
+              C 112 61 113.5 62.5 113.5 66.5
+              L 113.5 85
+              C 113.5 88.5 110 89.5 107 86.5
+              L 85 64.5
+              C 82 61.5 83 61 87 61 Z
+            " fill="url(#scrollLimeHeadGrad)" filter="url(#scrollArrowGlow)"/>
+          </svg>
+
+          <!-- Floating Notification Badge on the arrow head -->
+          <div id="arrow-notification-badge" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-white text-scroll-navy font-black text-xs flex items-center justify-center border-2 border-scroll-navy shadow-lg shadow-white/50">
+            1
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </section>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 01: HERO -> EL ICEBERG DIGITAL -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="1">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 01 · DIAGNÓSTICO</span>
+        <span class="portal-title">Inmersión al Iceberg Digital</span>
+        <i data-lucide="chevrons-down" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 2: EL ICEBERG LITERAL — DENTRO DEL SISTEMA SCROLL -->
+    <!-- (FORMA LITERAL DE ICEBERG: 15% SUPERFICIE | 85% MASA SUMERGIDA) -->
+    <!-- ============================================================== -->
+    <section id="iceberg" class="pt-16 pb-28 px-4 sm:px-6 max-w-7xl mx-auto relative reveal-on-scroll">
+      
+      <!-- Encabezado de la Sección -->
+      <div class="mb-12 text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-widest text-scroll-lima bg-scroll-lima/10 px-4 py-1.5 rounded-full border border-scroll-lima/30 font-display inline-block">
+          • Dentro del Sistema Scroll •
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-display font-black text-white tracking-tight">
+          La Realidad de las Campañas: <span class="text-gradient-scroll">El Iceberg Digital</span>
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto">
+          El trabajo publicitario y audiovisual de Scroll genera curiosidad masiva. Pero lo que ocurre bajo la superficie determina si esa atención se convierte en facturación real o se pierde en el celular del cliente.
+        </p>
+      </div>
+
+      <!-- ILUSTRACIÓN LITERAL DEL ICEBERG CON PALETA CORPORATIVA DE SCROLL -->
+      <div class="bezel-chassis p-4 sm:p-10 rounded-[40px] relative overflow-hidden border-2 border-scroll-turquesa/40 bg-gradient-to-b from-[#02182c] via-[#011425] to-[#000a14] shadow-2xl">
+        
+        <!-- ========================================== -->
+        <!-- PARTE 1: LA PUNTA DEL ICEBERG (SOBRE EL AGUA) -->
+        <!-- ========================================== -->
+        <div class="relative z-10 pt-4 pb-8">
+          
+          <div class="flex items-center justify-between mb-4">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-bold uppercase tracking-wider font-display border border-white/20">
+              <i data-lucide="sun" class="w-4 h-4 text-amber-300"></i>
+              <span>La Punta del Iceberg • 15% Visible</span>
+            </span>
+            <span class="text-[10px] font-mono text-scroll-lima font-bold bg-scroll-lima/10 px-3 py-1 rounded-full border border-scroll-lima/30">
+              Lo que el cliente ve y contrata
+            </span>
+          </div>
+
+          <!-- Tarjetas Flotantes de la Punta -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="p-5 rounded-2xl bg-[#021d38]/90 border border-scroll-turquesa/30 space-y-2 backdrop-blur-md">
+              <div class="w-8 h-8 rounded-xl bg-scroll-blue/60 flex items-center justify-center text-scroll-lima">
+                <i data-lucide="clapperboard" class="w-4 h-4"></i>
+              </div>
+              <h4 class="text-xs font-bold text-white uppercase tracking-wider">Cámaras & Reels 4K</h4>
+              <p class="text-[11px] text-slate-300 leading-relaxed">Producción audiovisual de cine que frena el scroll y despierta el deseo por el producto.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-[#021d38]/90 border border-scroll-turquesa/30 space-y-2 backdrop-blur-md">
+              <div class="w-8 h-8 rounded-xl bg-scroll-petroleo flex items-center justify-center text-scroll-turquesa">
+                <i data-lucide="target" class="w-4 h-4"></i>
+              </div>
+              <h4 class="text-xs font-bold text-white uppercase tracking-wider">Tráfico Digital Meta Ads</h4>
+              <p class="text-[11px] text-slate-300 leading-relaxed">Campañas optimizadas en Facebook e Instagram que disparan prospectos directo a WhatsApp.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-rose-950/40 border border-rose-500/40 space-y-2 backdrop-blur-md">
+              <div class="w-8 h-8 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-300">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              </div>
+              <h4 class="text-xs font-bold text-rose-200 uppercase tracking-wider">El Cuello de Botella</h4>
+              <p class="text-[11px] text-slate-300 leading-relaxed">Entran 100 personas al día: curiosos sin presupuesto mezclados con compradores que se enfrían si tardan horas en responder.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SVG VECTORIAL LITERAL DEL ICEBERG EN SCROLL -->
+        <!-- ========================================== -->
+        <div class="relative w-full max-w-4xl mx-auto my-4 py-2">
+          
+          <svg viewBox="0 0 1000 1200" class="w-full h-auto select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Degradados de las facetas de la punta (sobre el agua) -->
+              <linearGradient id="iceTipFacetLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="60%" stop-color="#E6FFFA"/>
+                <stop offset="100%" stop-color="#66FFE3"/>
+              </linearGradient>
+
+              <linearGradient id="iceTipFacetCenter" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="50%" stop-color="#D9F99D"/>
+                <stop offset="100%" stop-color="#AEF905"/>
+              </linearGradient>
+
+              <linearGradient id="iceTipFacetRight" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#66FFE3"/>
+                <stop offset="50%" stop-color="#02E7C1"/>
+                <stop offset="100%" stop-color="#004D5A"/>
+              </linearGradient>
+
+              <!-- Degradados de las facetas submarinas (colores Scroll) -->
+              <linearGradient id="underTurquesa" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#66FFE3" stop-opacity="0.85"/>
+                <stop offset="60%" stop-color="#02E7C1" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#004D5A" stop-opacity="0.95"/>
+              </linearGradient>
+
+              <linearGradient id="underPetroleo" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#004D5A" stop-opacity="0.95"/>
+                <stop offset="50%" stop-color="#003B5C" stop-opacity="0.95"/>
+                <stop offset="100%" stop-color="#011830" stop-opacity="1"/>
+              </linearGradient>
+
+              <linearGradient id="underLimaGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#AEF905" stop-opacity="0.85"/>
+                <stop offset="50%" stop-color="#02E7C1" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#003B5C" stop-opacity="0.95"/>
+              </linearGradient>
+
+              <linearGradient id="underDeepAbyss" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#036A86" stop-opacity="0.8"/>
+                <stop offset="60%" stop-color="#003B5C" stop-opacity="0.95"/>
+                <stop offset="100%" stop-color="#010d1d" stop-opacity="1"/>
+              </linearGradient>
+
+              <!-- Filtro Glow Neón -->
+              <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="8" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+
+            <!-- RAYOS DE LUZ SUBMARINOS (CAÚSTICAS) -->
+            <polygon points="500,240 340,1180 400,1200 500,240" fill="#02E7C1" opacity="0.05"/>
+            <polygon points="500,240 600,1200 660,1180 500,240" fill="#AEF905" opacity="0.04"/>
+            <polygon points="500,240 460,1200 540,1200 500,240" fill="#66FFE3" opacity="0.05"/>
+
+            <!-- ============================================== -->
+            <!-- 1. MASA SUBMARINA GIGANTESCA (85% DEL ICEBERG) -->
+            <!-- ============================================== -->
+            <g id="svg-submerged-iceberg">
+              <!-- Ala Exterior Izquierda Profunda -->
+              <polygon points="340,240 210,380 110,610 180,880 320,1080 490,1180 440,710 390,430" fill="url(#underPetroleo)" stroke="#02E7C1" stroke-width="1.8" stroke-opacity="0.45"/>
+
+              <!-- Ala Exterior Derecha Profunda -->
+              <polygon points="660,240 790,370 890,600 820,870 680,1080 510,1180 560,710 610,420" fill="url(#underDeepAbyss)" stroke="#02E7C1" stroke-width="1.8" stroke-opacity="0.45"/>
+
+              <!-- Faceta Central Superior Bajo Agua -->
+              <polygon points="340,240 500,240 490,480 390,430" fill="url(#underTurquesa)" stroke="#66FFE3" stroke-width="2" stroke-opacity="0.75"/>
+              <polygon points="500,240 660,240 610,420 490,480" fill="url(#underLimaGlow)" stroke="#AEF905" stroke-width="2" stroke-opacity="0.8"/>
+
+              <!-- Facetas Medias Interiores -->
+              <polygon points="390,430 490,480 470,720 340,680 210,380" fill="url(#underTurquesa)" opacity="0.8" stroke="#02E7C1" stroke-width="1.5" stroke-opacity="0.6"/>
+              <polygon points="490,480 610,420 790,370 660,680 470,720" fill="url(#underDeepAbyss)" stroke="#02E7C1" stroke-width="1.5" stroke-opacity="0.6"/>
+
+              <!-- Columna Vertebral Central Sumergida -->
+              <polygon points="340,680 470,720 490,960 360,930 180,880 110,610" fill="url(#underPetroleo)" stroke="#02E7C1" stroke-width="1.5" stroke-opacity="0.5"/>
+              <polygon points="470,720 660,680 890,600 820,870 640,940 490,960" fill="url(#underTurquesa)" opacity="0.85" stroke="#AEF905" stroke-width="1.6" stroke-opacity="0.7"/>
+
+              <!-- Ancla Abisal del Iceberg -->
+              <polygon points="360,930 490,960 500,1180 320,1080" fill="url(#underDeepAbyss)" stroke="#02E7C1" stroke-width="2" stroke-opacity="0.5"/>
+              <polygon points="490,960 640,940 680,1080 500,1180" fill="url(#underLimaGlow)" opacity="0.9" stroke="#AEF905" stroke-width="2" stroke-opacity="0.85"/>
+
+              <!-- Aristas Luminosas / Grietas de Neón -->
+              <line x1="500" y1="240" x2="490" y2="480" stroke="#FFFFFF" stroke-width="3" opacity="0.85" filter="url(#neonGlow)"/>
+              <line x1="490" y1="480" x2="470" y2="720" stroke="#66FFE3" stroke-width="2.5" opacity="0.9" filter="url(#neonGlow)"/>
+              <line x1="470" y1="720" x2="490" y2="960" stroke="#AEF905" stroke-width="3" opacity="0.9" filter="url(#neonGlow)"/>
+              <line x1="490" y1="960" x2="500" y2="1180" stroke="#02E7C1" stroke-width="2.5" opacity="0.8"/>
+
+              <!-- Partículas Flotantes de la Profundidad -->
+              <circle cx="280" cy="380" r="3" fill="#66FFE3" opacity="0.7"/>
+              <circle cx="230" cy="540" r="2.5" fill="#AEF905" opacity="0.6"/>
+              <circle cx="760" cy="460" r="3.5" fill="#02E7C1" opacity="0.7"/>
+              <circle cx="830" cy="680" r="2.5" fill="#66FFE3" opacity="0.6"/>
+              <circle cx="420" cy="880" r="3" fill="#AEF905" opacity="0.8"/>
+              <circle cx="580" cy="1060" r="2.5" fill="#02E7C1" opacity="0.6"/>
+            </g>
+
+            <!-- ============================================== -->
+            <!-- 2. LA LÍNEA DE FLOTACIÓN (SUPERFICIE DEL AGUA) -->
+            <!-- ============================================== -->
+            <g id="svg-waterline">
+              <line x1="20" y1="240" x2="980" y2="240" stroke="#02E7C1" stroke-width="6" opacity="0.4" filter="url(#neonGlow)"/>
+              <path d="M 20 240 C 140 232, 220 248, 340 240 C 440 233, 540 247, 660 240 C 780 233, 880 247, 980 240" fill="none" stroke="#02E7C1" stroke-width="3.5"/>
+              <path d="M 20 240 C 120 246, 240 234, 360 240 C 480 246, 600 234, 720 240 C 840 246, 920 234, 980 240" fill="none" stroke="#AEF905" stroke-width="1.8" opacity="0.85"/>
+            </g>
+
+            <!-- ============================================== -->
+            <!-- 3. LA PUNTA DEL ICEBERG (SOBRE EL AGUA)        -->
+            <!-- ============================================== -->
+            <g id="svg-iceberg-tip" filter="url(#neonGlow)">
+              <polygon points="500,40 420,140 340,240 500,240" fill="url(#iceTipFacetLeft)" stroke="#FFFFFF" stroke-width="1.8"/>
+              <polygon points="500,40 500,240 570,240 600,130" fill="url(#iceTipFacetCenter)" stroke="#AEF905" stroke-width="1.8"/>
+              <polygon points="500,40 600,130 660,240 570,240" fill="url(#iceTipFacetRight)" stroke="#02E7C1" stroke-width="1.6"/>
+              
+              <!-- Facetas Cinceladas de la Cúspide -->
+              <polygon points="500,40 480,110 420,140" fill="#FFFFFF" opacity="0.95"/>
+              <polygon points="500,40 520,105 600,130" fill="#F0FDF4" opacity="0.95"/>
+              
+              <!-- Reflejo Solar en el Pico -->
+              <circle cx="500" cy="40" r="12" fill="#AEF905" opacity="0.4" filter="url(#neonGlow)"/>
+              <circle cx="500" cy="40" r="4.5" fill="#FFFFFF"/>
+            </g>
+          </svg>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PARTE 2: EL AGUA & EL NIVEL SUMERGIDO (85%) -->
+        <!-- ========================================== -->
+        <div class="relative z-10 pt-6">
+          
+          <!-- Banner Divisorio de la Superficie -->
+          <div class="flex items-center justify-between pb-6 mb-8 border-b-2 border-dashed border-scroll-turquesa/40">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-scroll-turquesa/20 text-scroll-turquesaLight text-[11px] font-bold uppercase tracking-wider font-display border border-scroll-turquesa/40">
+              <i data-lucide="waves" class="w-4 h-4 text-scroll-turquesa"></i>
+              <span>Superficie del Agua • Nivel de Conversión</span>
+            </span>
+            <span class="text-[10px] font-mono text-slate-300 bg-white/5 px-3 py-1 rounded-full border border-white/10">
+              85% Sumergido: La Máquina de Ventas
+            </span>
+          </div>
+
+          <div class="text-center max-w-3xl mx-auto mb-10 space-y-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-scroll-turquesaLight bg-scroll-turquesa/10 px-3.5 py-1 rounded-full border border-scroll-turquesa/30 font-display">
+              Bajo la Superficie • Lo que Sostiene el Retorno del Cliente
+            </span>
+            <h3 class="text-2xl sm:text-4xl font-display font-black text-white">
+              El Sistema Automatizado de Scroll en WhatsApp
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              La tecnología que recibe a los prospectos al instante, aplica preguntas de filtro con inteligencia artificial y le entrega al vendedor humano solo a los clientes con dinero listos para comprar.
+            </p>
+          </div>
+
+          <!-- 4 CARTAS / SLIDES FLOTANTES DE LA PROFUNDIDAD DEL ICEBERG -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="iceberg-slides-container">
+            
+            <!-- Slide 1: Profundidad -20m -->
+            <div class="bezel-chassis p-6 sm:p-7 rounded-3xl border-scroll-lima/40 bg-gradient-to-b from-[#032a4a]/90 to-[#011425] flex flex-col justify-between space-y-4 hover:border-scroll-lima transition group reveal-on-scroll">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase tracking-widest text-scroll-lima font-mono bg-scroll-lima/10 px-3 py-1 rounded-full border border-scroll-lima/30">
+                    Nivel -20m • Inmediatez
+                  </span>
+                  <i data-lucide="zap" class="w-5 h-5 text-scroll-lima group-hover:scale-125 transition-transform"></i>
+                </div>
+                <h4 class="text-lg font-bold text-white font-display">Respuesta Inmediata en &lt; 10 Segundos</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  El prospecto que vio el anuncio no espera 3 horas. La IA contesta al instante las 24 horas del día con el tono propio del negocio, atiende la duda inicial y retiene al cliente antes de que busque a la competencia.
+                </p>
+              </div>
+              <div class="p-3 rounded-xl bg-black/50 border border-white/5 flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-400">Tiempo de Respuesta</span>
+                <span class="text-scroll-lima font-bold">&lt; 10 Segundos 24/7</span>
+              </div>
+            </div>
+
+            <!-- Slide 2: Profundidad -80m -->
+            <div class="bezel-chassis p-6 sm:p-7 rounded-3xl border-scroll-turquesa/40 bg-gradient-to-b from-[#032a4a]/90 to-[#011425] flex flex-col justify-between space-y-4 hover:border-scroll-turquesa transition group reveal-on-scroll">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase tracking-widest text-scroll-turquesa font-mono bg-scroll-turquesa/10 px-3 py-1 rounded-full border border-scroll-turquesa/30">
+                    Nivel -80m • Calificación
+                  </span>
+                  <i data-lucide="filter" class="w-5 h-5 text-scroll-turquesa group-hover:scale-125 transition-transform"></i>
+                </div>
+                <h4 class="text-lg font-bold text-white font-display">Filtro Inteligente de Prospectos</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Indaga con preguntas amables y naturales el presupuesto, ubicación y necesidad. Descarta de forma automática a los curiosos sin plata y califica a las personas que realmente tienen intención y capacidad de pago.
+                </p>
+              </div>
+              <div class="p-3 rounded-xl bg-black/50 border border-white/5 flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-400">Triaje de Leads</span>
+                <span class="text-scroll-turquesaLight font-bold">100% Automatizado</span>
+              </div>
+            </div>
+
+            <!-- Slide 3: Profundidad -150m -->
+            <div class="bezel-chassis p-6 sm:p-7 rounded-3xl border-scroll-petroleo/50 bg-gradient-to-b from-[#032a4a]/90 to-[#011425] flex flex-col justify-between space-y-4 hover:border-scroll-turquesaLight transition group reveal-on-scroll">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase tracking-widest text-scroll-turquesaLight font-mono bg-scroll-turquesa/10 px-3 py-1 rounded-full border border-scroll-turquesa/30">
+                    Nivel -150m • Traspaso Humano
+                  </span>
+                  <i data-lucide="user-check" class="w-5 h-5 text-scroll-turquesaLight group-hover:scale-125 transition-transform"></i>
+                </div>
+                <h4 class="text-lg font-bold text-white font-display">Traspaso en Caliente al Vendedor</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Cuando el prospecto está filtrado y verificado, el bot genera una alerta instantánea y le pasa la conversación al asesor humano del cliente con el resumen listo para cerrar la venta.
+                </p>
+              </div>
+              <div class="p-3 rounded-xl bg-black/50 border border-white/5 flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-400">Atención Humana</span>
+                <span class="text-scroll-lima font-bold">Solo Prospectos Calificados</span>
+              </div>
+            </div>
+
+            <!-- Slide 4: Profundidad -300m -->
+            <div class="bezel-chassis p-6 sm:p-7 rounded-3xl border-white/20 bg-gradient-to-b from-[#032a4a]/90 to-[#011425] flex flex-col justify-between space-y-4 hover:border-white transition group reveal-on-scroll">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase tracking-widest text-white font-mono bg-white/10 px-3 py-1 rounded-full border border-white/20">
+                    Nivel -300m • Auditoría
+                  </span>
+                  <i data-lucide="sheet" class="w-5 h-5 text-white group-hover:scale-125 transition-transform"></i>
+                </div>
+                <h4 class="text-lg font-bold text-white font-display">Parametrización & Excel en Tiempo Real</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Toda la base de datos de prospectos se registra automáticamente en Excel en vivo. Scroll le demuestra a la gerencia cuántos leads llegaron, cuántos se atendieron y el dinero retornado gracias a las campañas.
+                </p>
+              </div>
+              <div class="p-3 rounded-xl bg-black/50 border border-white/5 flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-400">Reporte Gerencial</span>
+                <span class="text-white font-bold">Excel Vivo Descargable</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 02: ICEBERG -> PLATAFORMA SAAS -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="2">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 02 · CENTRO DE COMANDO</span>
+        <span class="portal-title">Software SaaS Multi-Tenant Propio</span>
+        <i data-lucide="chevrons-down" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 3: LA PLATAFORMA SAAS PROPIA DE SCROLL -->
+    <!-- (EXPERIENCIA PINNED SCROLL-DRIVEN: EL SOFTWARE MUTA MIENTRAS HACES SCROLL) -->
+    <!-- ============================================================== -->
+    <section id="saas-plataforma" class="w-full relative">
+      
+      <!-- Pinned Scroll Track (320vh para rotación suave guiada por scroll) -->
+      <div id="saas-pin-wrapper" class="relative w-full" style="height: 320vh;">
+        
+        <div id="saas-pinned-stage" class="sticky top-0 min-h-screen w-full flex flex-col justify-center items-center py-8 px-4 sm:px-6 z-20">
+          
+          <div class="mb-5 text-center max-w-3xl mx-auto space-y-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-scroll-lima bg-scroll-lima/10 px-4 py-1 rounded-full border border-scroll-lima/30 font-display">
+              • Tu Propio Software SaaS •
+            </span>
+            <h2 class="text-2xl sm:text-4xl font-display font-black text-white">
+              La Plataforma Propia de Scroll
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 max-w-2xl mx-auto">
+              Scroll es la cara visible de la tecnología frente a sus clientes. Control total sobre empresas clientes, consumos y estados de conexión.
+            </p>
+          </div>
+
+          <!-- INDICADOR DE PROGRESO DE MÓDULOS ACTIVOS (SCROLL-DRIVEN) -->
+          <div class="flex items-center justify-center gap-3 mb-6">
+            <div class="flex items-center gap-1.5" id="saas-progress-dots">
+              <span class="saas-progress-step w-2.5 h-2.5 rounded-full bg-scroll-lima transition-all duration-300 scale-125"></span>
+              <span class="saas-progress-step w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+              <span class="saas-progress-step w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+              <span class="saas-progress-step w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+              <span class="saas-progress-step w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+              <span class="saas-progress-step w-2.5 h-2.5 rounded-full bg-white/20 transition-all duration-300"></span>
+            </div>
+            <span id="saas-step-counter" class="text-[10px] font-mono text-scroll-lima font-bold bg-scroll-lima/10 px-3 py-0.5 rounded-full border border-scroll-lima/30 uppercase">
+              Módulo 01 de 06 • Panel Master
+            </span>
+          </div>
+
+          <!-- DISPOSITIVOS 3D: INDICADORES VISUALES MULTI-DISPOSITIVO (SIN BOTONES, MUTAN AL SCROLLEAR) -->
+          <div class="flex justify-center items-center gap-2 sm:gap-4 mb-6 overflow-x-auto pb-1 max-w-full">
+            <div id="btn-device-laptop" onclick="switchDeviceView('laptop')" class="device-tab-btn active px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-scroll-lima bg-scroll-lima text-scroll-navy transition shadow-lg shadow-scroll-lima/20 cursor-pointer">
+              <i data-lucide="laptop" class="w-3.5 h-3.5"></i>
+              <span>Portátil (MacBook)</span>
+            </div>
+            <div id="btn-device-desktop" onclick="switchDeviceView('desktop')" class="device-tab-btn px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-slate-300 transition cursor-pointer hover:border-white/30">
+              <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+              <span>Escritorio (iMac)</span>
+            </div>
+            <div id="btn-device-tablet" onclick="switchDeviceView('tablet')" class="device-tab-btn px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-slate-300 transition cursor-pointer hover:border-white/30">
+              <i data-lucide="tablet" class="w-3.5 h-3.5"></i>
+              <span>Tableta (iPad Pro)</span>
+            </div>
+            <div id="btn-device-mobile" onclick="switchDeviceView('mobile')" class="device-tab-btn px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-white/10 bg-white/5 text-slate-300 transition cursor-pointer hover:border-white/30">
+              <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+              <span>Móvil (iPhone)</span>
+            </div>
+          </div>
+
+          <!-- MARCO DEL DISPOSITIVO 3D ROTATIVO -->
+          <div class="w-full max-w-4xl mx-auto perspective-[1200px]">
+            <div id="device-3d-chassis" class="bezel-chassis p-4 sm:p-6 rounded-[28px] border-2 border-scroll-turquesa/40 bg-gradient-to-b from-[#02182b] to-[#011124] shadow-2xl transition-all duration-700 transform mx-auto">
+              
+              <!-- Barra Superior del Dispositivo -->
+              <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                  <span id="device-address-bar" class="ml-3 text-[10px] font-mono text-slate-400 bg-black/40 px-3 py-1 rounded-full border border-white/5 hidden sm:inline-block">
+                    https://scroll.agencia/admin/panel-master
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-[9px] uppercase font-bold text-scroll-lima bg-scroll-lima/10 px-2 py-0.5 rounded-full border border-scroll-lima/20">
+                    Multi-Tenant Cloud
+                  </span>
+                  <i data-lucide="wifi" class="w-3.5 h-3.5 text-scroll-turquesa"></i>
+                </div>
+              </div>
+
+              <!-- PANTALLA INTERNA DEL DISPOSITIVO CON CONTENEDOR DE TRANSICIÓN SUAVE -->
+              <div id="device-screen-content" class="rounded-xl bg-[#010c1a] border border-white/10 p-5 sm:p-6 min-h-[300px] flex flex-col justify-between overflow-hidden relative">
+                <div id="device-screen-inner" class="space-y-4 flex flex-col justify-between h-full">
+                  <div>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+                      <div>
+                        <span class="text-[11px] text-scroll-turquesa font-bold uppercase tracking-wider block font-mono" id="device-module-tag">Módulo 01 • Control Master</span>
+                        <h3 class="text-lg sm:text-2xl font-black text-white font-display" id="device-module-title">Panel Master Scroll</h3>
+                      </div>
+                      <div class="flex items-center gap-2 bg-scroll-petroleo/60 px-3 py-1 rounded-xl border border-scroll-turquesa/30 text-[11px]">
+                        <span class="w-2 h-2 rounded-full bg-scroll-lima animate-pulse"></span>
+                        <span class="text-white font-medium" id="device-status-badge">12 Empresas Conectadas</span>
+                      </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl" id="device-module-desc">
+                      Scroll crea, suspende y administra empresas clientes en 30 segundos. Control total sobre consumos globales de IA, tokens y estados de conexión de WhatsApp en vivo.
+                    </p>
+                  </div>
+
+                  <!-- Mini Dashboard Cards Inside Mockup Screen -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 border-t border-white/10" id="device-mini-metrics">
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                      <span class="text-[9px] text-slate-400 uppercase font-semibold block">Total Atendidos</span>
+                      <span class="text-base sm:text-lg font-black text-white font-mono">1.840</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                      <span class="text-[9px] text-slate-400 uppercase font-semibold block">Leads Calificados</span>
+                      <span class="text-base sm:text-lg font-black text-scroll-lima font-mono">428</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                      <span class="text-[9px] text-slate-400 uppercase font-semibold block">Tiempo Promedio</span>
+                      <span class="text-base sm:text-lg font-black text-scroll-turquesa font-mono">6.4 seg</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                      <span class="text-[9px] text-slate-400 uppercase font-semibold block">Ahorro Humano</span>
+                      <span class="text-base sm:text-lg font-black text-white font-mono">160 horas</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- PISTA INFORMATIVA DE SCROLLING CONTINUO -->
+          <div class="mt-4 text-center text-[10px] text-slate-400 font-mono flex items-center gap-1.5 opacity-70">
+            <span>↓ Desliza hacia abajo: el software se adapta y muta en tiempo real ↓</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- LOS 6 PANELES DE LA PLATAFORMA (DETALLE EN BENTO GRID COMPLETO) -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+        
+        <div class="text-center mb-10 space-y-2">
+          <span class="text-xs font-mono font-bold text-scroll-turquesaLight uppercase tracking-wider bg-scroll-turquesa/10 px-3 py-1 rounded-full border border-scroll-turquesa/30">
+            Arquitectura del Software
+          </span>
+          <h3 class="text-2xl font-bold text-white">Los 6 Módulos Centrales de la Plataforma</h3>
+          <p class="text-xs text-slate-300 max-w-xl mx-auto">
+            Haz clic en cualquiera de los módulos para inspeccionarlo en el dispositivo o explora sus especificaciones técnicas:
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          
+          <!-- Panel 1 -->
+          <div id="bento-panel-1" onclick="selectPanel(1)" class="bento-panel-card bezel-chassis p-6 space-y-3 cursor-pointer hover:border-scroll-lima transition group border-scroll-lima/50">
+            <div class="w-10 h-10 rounded-2xl bg-scroll-blue text-scroll-lima flex items-center justify-center border border-scroll-turquesa/30 group-hover:scale-110 transition-transform">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-base font-bold text-white">Panel Master Scroll</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Scroll crea, suspende y administra empresas clientes en 30 segundos. Control total sobre consumos globales y estados de conexión.
+            </p>
+          </div>
+
+          <!-- Panel 2 -->
+          <div id="bento-panel-2" onclick="selectPanel(2)" class="bento-panel-card bezel-chassis p-6 space-y-3 cursor-pointer hover:border-scroll-lima transition group">
+            <div class="w-10 h-10 rounded-2xl bg-scroll-petroleo text-scroll-turquesa flex items-center justify-center border border-scroll-turquesa/30 group-hover:scale-110 transition-transform">
+              <i data-lucide="shield" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-base font-bold text-white">Aislamiento Total por Empresa</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Las bases de datos, chats y catálogos de cada empresa están 100% aislados. Ningún cliente puede ver la información de otro negocio.
+            </p>
+          </div>
+
+          <!-- Panel 3 -->
+          <div id="bento-panel-3" onclick="selectPanel(3)" class="bento-panel-card bezel-chassis p-6 space-y-3 cursor-pointer hover:border-scroll-lima transition group">
+            <div class="w-10 h-10 rounded-2xl bg-scroll-deep text-scroll-turquesaLight flex items-center justify-center border border-scroll-turquesa/30 group-hover:scale-110 transition-transform">
+              <i data-lucide="book-open" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-base font-bold text-white">Catálogo & Reglas Vivas</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Permite editar productos, precios, fotos, promociones y preguntas filtro para que el bot responda con precisión sin inventar datos.
+            </p>
+          </div>
+
+          <!-- Panel 4 -->
+          <div id="bento-panel-4" onclick="selectPanel(4)" class="bento-panel-card bezel-chassis p-6 space-y-3 cursor-pointer hover:border-scroll-lima transition group">
+            <div class="w-10 h-10 rounded-2xl bg-scroll-dark text-scroll-lima flex items-center justify-center border border-scroll-lima/30 group-hover:scale-110 transition-transform">
+              <i data-lucide="gauge" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-base font-bold text-white">Medidor de Consumo IA</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Mide con exactitud cuántos tokens y mensajes consumió cada cliente. Scroll le factura el consumo a cada empresa con su propio margen comercial.
+            </p>
+          </div>
+
+          <!-- Panel 5 -->
+          <div id="bento-panel-5" onclick="selectPanel(5)" class="bento-panel-card bezel-chassis p-6 space-y-3 cursor-pointer hover:border-scroll-lima transition group">
+            <div class="w-10 h-10 rounded-2xl bg-scroll-blue text-white flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-base font-bold text-white">Alertas & Exportación a Excel</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Avisa en tiempo real al equipo comercial cuando un prospecto está calificado y permite descargar toda la base de datos de leads en Excel.
+            </p>
+          </div>
+
+          <!-- Panel 6 -->
+          <div id="bento-panel-6" onclick="selectPanel(6)" class="bento-panel-card bezel-chassis p-6 space-y-3 cursor-pointer hover:border-scroll-lima transition group">
+            <div class="w-10 h-10 rounded-2xl bg-scroll-petroleo text-scroll-lima flex items-center justify-center border border-scroll-lima/30 group-hover:scale-110 transition-transform">
+              <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-base font-bold text-white">Reportes de Retorno al Cliente</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Métricas mensuales listas para mostrar en juntas directivas: total de atendidos, calificados y traspasados a asesor humano.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 03: PLATAFORMA SAAS -> PERSONALIZACIÓN 19H -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="3">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 03 · INGENIERÍA EN EL NEGOCIO</span>
+        <span class="portal-title">Protocolo de 19 Horas Estratégicas</span>
+        <i data-lucide="chevrons-down" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 4: PERSONALIZACIÓN DE SOFTWARE (LAS 19 HORAS DEDICADAS) -->
+    <!-- (ESTÉTICA MINIMALISTA Y PROFESIONAL INSPIRADA EN REFERENCIA UI) -->
+    <!-- ============================================================== -->
+    <section id="personalizacion" class="py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto border-t border-white/10 reveal-on-scroll">
+      
+      <div class="mb-14 text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-widest text-scroll-lima bg-scroll-lima/10 px-4 py-1.5 rounded-full border border-scroll-lima/30 font-display">
+          • Acompañamiento Estratégico •
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-display font-black text-white">
+          Personalización de Software
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Cada empresa tiene dinámicas comerciales particulares, dudas recurrentes y objeciones únicas. Para que un asesor con inteligencia artificial realmente represente con fidelidad la marca de un cliente, se requiere inmersión técnica y estratégica.
+        </p>
+      </div>
+
+      <!-- DESGLOSE DE LAS 19 HORAS EN 5 BLOQUES LIMPIOS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto mb-8">
+        
+        <!-- Bloque 1: Investigación -->
+        <div class="bezel-chassis p-5 text-left border-t-4 border-t-scroll-turquesa bg-[#02182b] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-display font-black text-scroll-turquesa font-mono">2 h</span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-full">Fase 1</span>
+            </div>
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Investigación Previa</h4>
+            <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+              Análisis del modelo de negocio, catálogo de productos, público objetivo y objeciones frecuentes de los clientes del comercio.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/5 text-[10px] text-slate-400">
+            Entrega: Diagnóstico y matriz de preguntas
+          </div>
+        </div>
+
+        <!-- Bloque 2: Jornada Presencial -->
+        <div class="bezel-chassis p-5 text-left border-t-4 border-t-scroll-lima bg-gradient-to-b from-scroll-blue/40 to-[#02182b] flex flex-col justify-between shadow-lg shadow-scroll-lima/10">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-display font-black text-scroll-lima font-mono">8 h</span>
+              <span class="text-[10px] uppercase font-black text-scroll-navy bg-scroll-lima px-2.5 py-0.5 rounded-full">Clave</span>
+            </div>
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Jornada Presencial In Situ</h4>
+            <p class="text-[11px] text-slate-200 mt-2 leading-relaxed">
+              Inmersión directa dentro del negocio para entender su operación real, tiempos de respuesta y cómo venden sus mejores asesores humanos.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/5 text-[10px] text-scroll-lima">
+            Entrega: Flujo comercial validado en vivo
+          </div>
+        </div>
+
+        <!-- Bloque 3: Configuración -->
+        <div class="bezel-chassis p-5 text-left border-t-4 border-t-scroll-turquesaLight bg-[#02182b] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-display font-black text-white font-mono">3 h</span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-full">Fase 3</span>
+            </div>
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Configuración del Bot</h4>
+            <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+              Redacción de instrucciones maestras, documento base de conocimiento, catálogo digital y reglas estrictas de filtrado comercial.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/5 text-[10px] text-slate-400">
+            Entrega: Bot parametrizado y probado
+          </div>
+        </div>
+
+        <!-- Bloque 4: Preparación -->
+        <div class="bezel-chassis p-5 text-left border-t-4 border-t-scroll-blue bg-[#02182b] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-display font-black text-white font-mono">2 h</span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-full">Fase 4</span>
+            </div>
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Preparación Técnica</h4>
+            <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+              Diseño de la guía operativa y personalización del material práctico adaptado específicamente al equipo humano de la empresa.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/5 text-[10px] text-slate-400">
+            Entrega: Manual operativo comercial
+          </div>
+        </div>
+
+        <!-- Bloque 5: Capacitación -->
+        <div class="bezel-chassis p-5 text-left border-t-4 border-t-scroll-petroleo bg-[#02182b] flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-display font-black text-scroll-turquesaLight font-mono">4 h</span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-full">Fase 5</span>
+            </div>
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Capacitación al Equipo</h4>
+            <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+              Taller práctico con el equipo de ventas para enseñarles a recibir, dar seguimiento y cerrar los prospectos calificados que entrega la IA.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/5 text-[10px] text-slate-400">
+            Entrega: Equipo capacitado y cierre fluido
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RESUMEN DE COMPROMISO PROFESIONAL -->
+      <div class="bezel-chassis p-6 rounded-3xl max-w-4xl mx-auto border border-scroll-lima/30 bg-scroll-dark/90 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="space-y-1 text-center sm:text-left">
+          <span class="text-[10px] text-scroll-lima font-bold uppercase tracking-wider font-display">Dedicación Profesional Total</span>
+          <h4 class="text-xl font-bold text-white">19 Horas de Trabajo Estratégico por Empresa</h4>
+          <p class="text-xs text-slate-300">Incluye 1 semana continua de calibración y ajustes posteriores al lanzamiento en vivo.</p>
+        </div>
+        <div class="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-center">
+          <span class="text-[10px] text-slate-400 block uppercase font-bold">Garantía Operativa</span>
+          <span class="text-sm font-bold text-scroll-lima">Estabilidad Día 1</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 04: PERSONALIZACIÓN -> ARQUITECTURA -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="4">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 04 · ARQUITECTURA TÉCNICA</span>
+        <span class="portal-title">Conexión QR vs Meta Cloud API</span>
+        <i data-lucide="chevrons-down" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 5: ARQUITECTURA & CONEXIÓN (REDiseño MODERNO) -->
+    <!-- ============================================================== -->
+    <section id="arquitectura" class="py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto relative reveal-on-scroll">
+      
+      <div class="mb-14 text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-widest text-scroll-turquesaLight bg-scroll-turquesa/10 px-4 py-1.5 rounded-full border border-scroll-turquesa/30 font-display">
+          • Arquitectura & Conexión •
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-display font-black text-white">
+          Ingeniería de Conexión a WhatsApp
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Diseñada para arrancar sin burocracia ni costos por mensaje de Meta, con la flexibilidad de escalar modularmente a la nube corporativa cuando el volumen lo exija.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        
+        <!-- Método 1: Conexión Instantánea QR -->
+        <div class="bezel-chassis p-7 rounded-3xl border-scroll-lima/40 bg-gradient-to-b from-[#032a4a]/70 to-[#011a33]/90 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-scroll-lima bg-scroll-lima/10 px-3 py-1 rounded-full border border-scroll-lima/30 font-display">
+              Método Seleccionado: QR WhatsApp Web
+            </span>
+            <i data-lucide="qr-code" class="w-5 h-5 text-scroll-lima"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">Arranque Inmediato y Cero Trámites con Meta</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Es la misma tecnología que ya construimos y probamos en producción en proyectos como ServirPlus. El cliente abre la plataforma, escanea el código QR con su celular y el bot queda respondiendo en 2 minutos.
+          </p>
+          
+          <div class="space-y-2 text-xs text-slate-200 pt-2 border-t border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="text-scroll-lima font-bold">✓</span>
+              <span><strong>0 Días de Espera:</strong> Sin verificar tarjetas bancarias ni empresas en Meta.</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-scroll-lima font-bold">✓</span>
+              <span><strong>0 Costo por Mensaje:</strong> No cobra tarifas por conversación iniciada como Meta.</span>
+            </div>
+            <div class="flex items-center gap-2 text-scroll-turquesaLight">
+              <span class="text-scroll-turquesa font-bold">✓</span>
+              <span><strong>Aislamiento de Sesiones:</strong> Cada empresa tiene su propio contenedor virtual independiente.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Método 2: Escalabilidad Meta Cloud API -->
+        <div class="bezel-chassis p-7 rounded-3xl border-white/10 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 bg-white/5 px-3 py-1 rounded-full font-display">
+              Fase Futura: Meta Cloud API
+            </span>
+            <i data-lucide="cloud" class="w-5 h-5 text-slate-400"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">Escalabilidad Industrial Masiva</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            La plataforma queda estructurada de manera modular para que, si un cliente corporativo de Scroll llega a miles de conversaciones al día, podamos conectar la API Oficial de Meta Cloud como un upgrade sin tener que reescribir el sistema.
+          </p>
+
+          <div class="space-y-2 text-xs text-slate-400 pt-2 border-t border-white/10">
+            <div class="flex items-center gap-2">
+              <span>• Requiere verificación de personería jurídica y cámara de comercio con Meta.</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>• Meta factura por cada bloque de conversación de 24 horas.</span>
+            </div>
+            <div class="flex items-center gap-2 text-scroll-turquesaLight">
+              <span>• Ideal como venta de upgrade para clientes corporativos de alto volumen.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 05: ARQUITECTURA -> CASOS DE ÉXITO -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="5">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 05 · EVIDENCIA REAL</span>
+        <span class="portal-title">Casos en Producción (ServirPlus & Faros)</span>
+        <i data-lucide="chevrons-down" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 6: CASOS DE ÉXITO & REFERENTES REALES -->
+    <!-- (SERVIRPLUS + FAROS + FUSIÓN METALEVEL & CASA TRADICIÓN) -->
+    <!-- ============================================================== -->
+    <section id="casos-exito" class="py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto relative transition-colors duration-1000 reveal-on-scroll" style="background: radial-gradient(circle at 50% 50%, rgba(10, 25, 47, 0.6) 0%, transparent 80%);">
+      
+      <div class="mb-14 text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-4 py-1.5 rounded-full border border-[#D4AF37]/30 font-display">
+          • Tecnología en Producción •
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-display font-black text-white">
+          Casos de Éxito & Referentes Reales
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Esta plataforma no es una idea en borrador. Está respaldada por arquitecturas activas que procesan, filtran y cierran conversaciones todos los días.
+        </p>
+      </div>
+
+      <!-- GRID DE CASOS DE ÉXITO -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+        
+        <!-- CASO 1: SERVIRPLUS (HERMANO TECNOLÓGICO DE FILTRO HV) -->
+        <div class="bezel-chassis p-7 rounded-[28px] border-white/10 bg-[#051829] space-y-5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-scroll-lima bg-scroll-lima/10 px-3 py-1 rounded-full border border-scroll-lima/20 font-mono">
+              Hermano Tecnológico • En Producción
+            </span>
+            <i data-lucide="file-text" class="w-5 h-5 text-scroll-lima"></i>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-display font-black text-white">ServirPlus • Filtro Masivo por WhatsApp</h3>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              Sistema de WhatsApp Business con IA que recibe a los candidatos de vacantes laborales, hace preguntas de filtro en caliente, analiza hojas de vida en PDF/foto y asigna etiquetas automáticas en WhatsApp Business sin que Recursos Humanos intervenga.
+            </p>
+          </div>
+
+          <!-- Métricas Reales de ServirPlus -->
+          <div class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-black/40 border border-white/5 text-center">
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase block font-semibold">Chats Atendidos</span>
+              <span class="text-base font-black text-white font-mono">+500</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase block font-semibold">Triaje IA</span>
+              <span class="text-base font-black text-scroll-lima font-mono">100% Auto</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase block font-semibold">Exportación</span>
+              <span class="text-base font-black text-scroll-turquesa font-mono">Excel Vivo</span>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-400 italic">
+            "El código decide y la IA solo interpreta las respuestas. Cero saturación del personal humano y base de datos siempre lista."
+          </p>
+        </div>
+
+        <!-- CASO 2: FAROS TRAINING CENTER -->
+        <div class="bezel-chassis p-7 rounded-[28px] border-white/10 bg-[#051829] space-y-5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-scroll-turquesa bg-scroll-turquesa/10 px-3 py-1 rounded-full border border-scroll-turquesa/20 font-mono">
+              Gran Escala • Institucional
+            </span>
+            <i data-lucide="award" class="w-5 h-5 text-scroll-turquesa"></i>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-display font-black text-white">Faros Training Center</h3>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              Plataforma deportiva de alto rendimiento y gestión multi-rol en producción. Control de usuarios, entrenadores, membresías y módulos administrativos conectados a bases de datos en tiempo real.
+            </p>
+          </div>
+
+          <!-- Métricas Reales Faros -->
+          <div class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-black/40 border border-white/5 text-center">
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase block font-semibold">Arquitectura</span>
+              <span class="text-base font-black text-white font-mono">Multi-Rol</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase block font-semibold">Seguridad</span>
+              <span class="text-base font-black text-scroll-turquesa font-mono">Cloud Rules</span>
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase block font-semibold">Estabilidad</span>
+              <span class="text-base font-black text-scroll-lima font-mono">99.9% Uptime</span>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-400 italic">
+            "Capacidad demostrada para desarrollar sistemas complejos con altos volúmenes de usuarios y exigencias de estabilidad comercial."
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- CASO 3 & ANIMACIÓN: EL ENCUENTRO ENTRE METALEVEL Y SCROLL -->
+      <!-- ======================================================== -->
+      <div id="metalevel-fusion-box" class="bezel-chassis p-8 sm:p-12 rounded-[36px] max-w-5xl mx-auto border-2 border-[#D4AF37]/40 bg-gradient-to-r from-[#0A192F] via-[#0E2442] to-[#01122a] shadow-2xl relative overflow-hidden transition-all duration-1000">
+        
+        <!-- Elementos de Fondo con Vibes de MetaLevel -->
+        <div class="absolute -top-16 -right-16 w-60 h-60 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-60 h-60 bg-scroll-turquesa/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="text-center max-w-2xl mx-auto space-y-4 mb-8">
+          <span class="text-xs font-bold uppercase tracking-widest text-[#D4AF37] font-mono">
+            ★ Caso Especial • Alianza de Ingeniería ★
+          </span>
+          <h3 class="text-2xl sm:text-4xl font-display font-black text-white">
+            MetaLevel Code & Casa Tradición
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Desarrollo e-commerce B2B y automatización de pedidos por WhatsApp con cero comisiones bancarias para distribución gastronómica premium.
+          </p>
+        </div>
+
+        <!-- EL ENCUENTRO DE LOGOS (ANIMACIÓN 3D AL HACER SCROLL) -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16 py-6" id="logos-collision-wrapper">
+          
+          <!-- Logo MetaLevel (M Geométrica) -->
+          <div id="metalevel-logo-glow" class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-black/80 border-2 border-[#D4AF37] flex items-center justify-center p-4 shadow-2xl shadow-[#D4AF37]/20 transition-all duration-1000 group">
+            <img src="logo_metalevel.png" alt="MetaLevel Logo" class="w-full h-full object-contain filter drop-shadow group-hover:scale-105 transition-transform">
+          </div>
+
+          <!-- Rayo / Conector de Fusión -->
+          <div class="flex items-center gap-2">
+            <span class="w-8 sm:w-16 h-0.5 bg-gradient-to-r from-[#D4AF37] to-scroll-turquesa rounded-full animate-pulse"></span>
+            <div class="w-8 h-8 rounded-full bg-black/80 border border-scroll-lima flex items-center justify-center text-scroll-lima text-xs font-black shadow-lg">
+              ✕
+            </div>
+            <span class="w-8 sm:w-16 h-0.5 bg-gradient-to-r from-scroll-turquesa to-scroll-lima rounded-full animate-pulse"></span>
+          </div>
+
+          <!-- Isotipo Scroll -->
+          <div id="scroll-logo-glow" class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#01122a] border-2 border-scroll-lima flex items-center justify-center p-4 shadow-2xl shadow-scroll-lima/30 transition-all duration-1000 group">
+            <img src="logo.png" alt="Scroll Logo" class="w-full h-full object-contain group-hover:scale-105 transition-transform">
+          </div>
+
+        </div>
+
+        <p class="text-center text-xs text-slate-300 max-w-xl mx-auto mt-4">
+          La ingeniería de software de <strong class="text-[#D4AF37]">MetaLevel</strong> se integra con la creatividad y tracción comercial de <strong class="text-scroll-lima">Scroll</strong> para construir una solución definitiva.
+        </p>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 06: CASOS DE ÉXITO -> MODELOS DE INVERSIÓN -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="6">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 06 · MODELOS DE INVERSIÓN</span>
+        <span class="portal-title">3 Opciones de Adquisición (A, B y C)</span>
+        <i data-lucide="chevrons-down" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 7: OPCIONES DE INVERSIÓN (EN ORDEN LÓGICO A, B, C) -->
+    <!-- ============================================================== -->
+    <section id="precios" class="py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto relative reveal-on-scroll">
+      
+      <div class="mb-14 text-center max-w-3xl mx-auto space-y-3">
+        <span class="text-xs font-bold uppercase tracking-widest text-scroll-lima bg-scroll-lima/10 px-4 py-1.5 rounded-full border border-scroll-lima/30 font-display">
+          • Opciones de Inversión •
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-display font-black text-white">
+          3 Formas de llevar esta tecnología a Scroll
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Estructura de inversión clara y en orden lógico para adaptarse a la estrategia de negocio y propiedad que Scroll prefiera.
+        </p>
+      </div>
+
+      <!-- 3 PRICING CARDS (ESTRICTO ORDEN: A, B, C) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12" id="pricing-cards-container">
+        
+        <!-- OPCIÓN A: COMPRA TOTAL -->
+        <div class="bezel-chassis p-7 rounded-[28px] border-white/15 flex flex-col justify-between transition hover:border-scroll-turquesa bg-[#031d38]/80 reveal-on-scroll">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-scroll-turquesa uppercase tracking-wider font-display">Opción A</span>
+              <span class="text-[10px] bg-white/10 text-slate-300 px-2.5 py-0.5 rounded-full font-semibold">Propiedad Total</span>
+            </div>
+            <h3 class="font-display font-black text-2xl text-white">Compra Total</h3>
+            <p class="text-xs text-slate-300 mt-1 mb-5 leading-relaxed">Scroll quiere ser dueña absoluta de la tecnología y el código fuente.</p>
+
+            <div class="mb-5 pb-5 border-b border-white/10">
+              <span class="text-xs text-slate-400">Inversión única</span>
+              <p class="text-3xl sm:text-4xl font-display font-black text-white mt-0.5">$7.500.000 <span class="text-xs font-sans text-slate-400">COP</span></p>
+              <span class="text-[11px] text-scroll-lima font-medium block mt-1">Sin mensualidades nunca más</span>
+            </div>
+
+            <ul class="space-y-2.5 text-xs text-slate-300">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Alcance completo de la plataforma</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Dueño del código: <strong>Scroll</strong></span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Operador del servidor: <strong>Scroll</strong></span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Entrega en repositorio propio de Scroll</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Soporte posterior por horas según demanda</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4 border-t border-white/10">
+            <a href="#aprobacion" class="w-full py-3 rounded-xl text-xs font-bold border border-scroll-turquesa/40 text-scroll-turquesaLight hover:bg-scroll-turquesa/10 transition block text-center">
+              Seleccionar Opción A
+            </a>
+          </div>
+        </div>
+
+        <!-- OPCIÓN B: MVP ESENCIAL -->
+        <div class="bezel-chassis p-7 rounded-[28px] border-white/15 flex flex-col justify-between transition hover:border-scroll-turquesa bg-[#031d38]/80 reveal-on-scroll">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-display">Opción B</span>
+              <span class="text-[10px] bg-white/10 text-slate-300 px-2.5 py-0.5 rounded-full font-semibold">Validación</span>
+            </div>
+            <h3 class="font-display font-black text-2xl text-white">MVP Esencial</h3>
+            <p class="text-xs text-slate-300 mt-1 mb-5 leading-relaxed">Scroll quiere validar el modelo con baja inversión inicial.</p>
+
+            <div class="mb-5 pb-5 border-b border-white/10">
+              <span class="text-xs text-slate-400">Inversión inicial única</span>
+              <p class="text-3xl sm:text-4xl font-display font-black text-white mt-0.5">$2.500.000 <span class="text-xs font-sans text-slate-400">COP</span></p>
+              <span class="text-[11px] text-scroll-lima font-medium block mt-1">Sin mensualidades a Santiago</span>
+            </div>
+
+            <ul class="space-y-2.5 text-xs text-slate-300">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Alcance esencial para salir al mercado</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Dueño del código: <strong>Scroll</strong></span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Operador del servidor: <strong>Scroll</strong></span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Soporte por horas según demanda</span>
+              </li>
+              <li class="flex items-center gap-2 text-slate-500">
+                <i data-lucide="minus" class="w-4 h-4 text-slate-600"></i>
+                <span>Alertas y reportes avanzados (Fase 2)</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4 border-t border-white/10">
+            <a href="#aprobacion" class="w-full py-3 rounded-xl text-xs font-bold border border-white/20 text-slate-300 hover:bg-white/10 transition block text-center">
+              Seleccionar Opción B
+            </a>
+          </div>
+        </div>
+
+        <!-- OPCIÓN C: LICENCIA & ALIANZA -->
+        <div class="bezel-chassis p-7 rounded-[28px] border-2 border-scroll-lima bg-gradient-to-b from-[#032a4a] to-[#011a33] flex flex-col justify-between relative shadow-2xl shadow-scroll-lima/20 transform md:-translate-y-3 reveal-on-scroll">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-scroll-lima text-scroll-navy font-display font-extrabold text-[10px] uppercase tracking-wider px-4 py-1 rounded-full shadow-lg">
+            ★ Alianza Tecnológica ★
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2 mt-1">
+              <span class="text-xs font-bold text-scroll-lima uppercase tracking-wider font-display">Opción C</span>
+              <span class="text-[10px] bg-scroll-lima/20 text-scroll-lima border border-scroll-lima/40 px-2.5 py-0.5 rounded-full font-bold">Sin fricción técnica</span>
+            </div>
+            <h3 class="font-display font-black text-2xl text-white">Licencia & Alianza</h3>
+            <p class="text-xs text-slate-200 mt-1 mb-5 leading-relaxed">Scroll vende y atiende clientes sin preocuparse por servidores ni soporte técnico.</p>
+
+            <div class="mb-5 pb-5 border-b border-white/10">
+              <span class="text-xs text-slate-400">Inversión inicial (Precio MVP)</span>
+              <p class="text-3xl sm:text-4xl font-display font-black text-white mt-0.5">$2.500.000 <span class="text-xs font-sans text-slate-400">COP</span></p>
+              <div class="mt-2 bg-scroll-petroleo/80 p-2.5 rounded-xl border border-scroll-turquesa/30">
+                <span class="text-xs text-scroll-lima font-bold block">+ $90.000 COP/mes por empresa activa</span>
+                <span class="text-[10px] text-slate-300">Paga el servidor continuo y monitoreo de cada bot conectado.</span>
+              </div>
+            </div>
+
+            <ul class="space-y-2.5 text-xs text-slate-100">
+              <li class="flex items-center gap-2">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima"></i>
+                <span class="font-semibold text-white">Plataforma COMPLETA desde el día 1</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Licencia de uso y reventa para Scroll</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima"></i>
+                <span class="text-scroll-lima font-semibold">Santiago opera servidor, monitoreo y soporte</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Reconexión automática si WhatsApp se desconecta</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-scroll-lima"></i>
+                <span>Actualizaciones continuas incluidas</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4 border-t border-white/10">
+            <a href="#aprobacion" class="w-full py-3.5 rounded-xl text-xs font-bold bg-scroll-lima text-scroll-navy hover:bg-scroll-limaHover transition shadow-lg shadow-scroll-lima/30 block text-center">
+              Seleccionar Opción C
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MATRIZ DE COMPARACIÓN LIMPIA -->
+      <div class="bezel-chassis p-6 sm:p-8 rounded-[32px] max-w-5xl mx-auto mb-10 overflow-x-auto">
+        <h4 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+          <i data-lucide="list-checks" class="w-5 h-5 text-scroll-lima"></i>
+          <span>Matriz de Alcance Funcional</span>
+        </h4>
+
+        <table class="w-full text-left text-xs border-collapse min-w-[600px]">
+          <thead>
+            <tr class="border-b border-white/15 text-slate-400">
+              <th class="py-3 px-4 font-bold">Funcionalidad</th>
+              <th class="py-3 px-4 text-center font-bold text-white">Opción A (Compra)</th>
+              <th class="py-3 px-4 text-center font-bold text-white">Opción B (MVP)</th>
+              <th class="py-3 px-4 text-center font-bold text-scroll-lima bg-scroll-lima/10 rounded-t-xl">Opción C (Licencia)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-slate-300">
+            <tr>
+              <td class="py-2.5 px-4">Panel Master Scroll y gestión de empresas</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">✅</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-4">Datos y chats de cada empresa 100% aislados</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">✅</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-4">Catálogo de productos, servicios y reglas vivas</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">✅</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-4">Vincular WhatsApp con QR en 2 minutos</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">✅</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-4">Historial de conversaciones y medidor de tokens</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-slate-400">Básico</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">✅</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-4">Alertas automáticas y exportación de leads a Excel</td>
+              <td class="text-center text-scroll-lima font-bold">✅</td>
+              <td class="text-center text-slate-600">—</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">✅</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-4">Operación del servidor y reconexión automática</td>
+              <td class="text-center text-slate-400">Scroll</td>
+              <td class="text-center text-slate-400">Scroll</td>
+              <td class="text-center text-scroll-lima font-bold bg-scroll-lima/5">Incluido (Santiago)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FORMAS DE PAGO CLARAS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div class="bezel-chassis p-7 rounded-3xl space-y-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="zap" class="w-5 h-5 text-scroll-lima"></i>
+            <h4 class="text-base font-bold text-white">Modalidad 1: Fast-Track (De Contado)</h4>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Pago del 100% al iniciar. El proyecto adquiere máxima prioridad de ingeniería y el cronograma de entrega se reduce de 8 a <strong>6 semanas</strong>.
+          </p>
+          <div class="p-3 rounded-xl bg-scroll-lima/10 border border-scroll-lima/30 text-xs text-scroll-lima font-semibold">
+            Recomendado para agencias que desean salir al mercado lo antes posible.
+          </div>
+        </div>
+
+        <div class="bezel-chassis p-7 rounded-3xl space-y-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar" class="w-5 h-5 text-scroll-turquesa"></i>
+            <h4 class="text-base font-bold text-white">Modalidad 2: En 3 Cuotas</h4>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            1/3 al iniciar el proyecto · 1/3 en la presentación de la demo funcional (Semana 4) · 1/3 contra entrega final y paso a producción (Semana 8).
+          </p>
+          <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-400">
+            Flujo de caja equilibrado y respaldado en entregables comprobables.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- PORTAL DE EXPERIENCIA 07: INVERSIÓN -> CLÍMAX & SIMULADOR -->
+    <!-- ============================================================== -->
+    <div class="chapter-transition-portal" data-chapter="7">
+      <div class="portal-line-in"></div>
+      <div class="portal-badge">
+        <div class="portal-radar">
+          <span class="portal-radar-ping"></span>
+          <span class="portal-radar-core"></span>
+        </div>
+        <span class="portal-tag">FASE 07 · ACTIVACIÓN INMEDIATA</span>
+        <span class="portal-title">Simulador Inmobiliario & Alianza</span>
+        <i data-lucide="sparkles" class="portal-icon"></i>
+      </div>
+      <div class="portal-line-out"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECCIÓN 8: CÚSPIDE — ¡TRABAJEMOS JUNTOS! + QR & SIMULADOR REAL ESTATE -->
+    <!-- (EL DEMO DE METALEVEL CON CASA TRADICIÓN: VENDEDOR EJEMPLAR) -->
+    <!-- ============================================================== -->
+    <section id="aprobacion" class="py-20 sm:py-32 px-4 sm:px-6 max-w-6xl mx-auto relative reveal-on-scroll">
+      
+      <!-- CÚSPIDE PRINCIPAL: ¡TRABAJEMOS JUNTOS! -->
+      <div class="bezel-chassis p-8 sm:p-14 rounded-[40px] border-2 border-scroll-lima/60 bg-gradient-to-r from-scroll-blue via-scroll-petroleo to-scroll-navy shadow-2xl relative overflow-hidden mb-16">
+        
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-scroll-lima/20 text-scroll-lima border border-scroll-lima/30 text-xs font-bold uppercase tracking-wider mb-4 font-display">
+          🚀 La Cúspide de la Propuesta
+        </div>
+
+        <h3 class="font-display font-black text-3xl sm:text-6xl text-white tracking-tight mb-4">
+          ¡Trabajemos juntos!
+        </h3>
+        
+        <p class="max-w-2xl mx-auto text-slate-200 text-sm sm:text-base leading-relaxed mb-8">
+          Scroll ya tiene la confianza de las empresas y el talento creativo. Añadamos la máquina de conversión con inteligencia artificial que blindará cada cliente y convertirá sus anuncios en resultados tangibles.
+        </p>
+
+        <div class="flex flex-wrap justify-center items-center gap-4 mb-8">
+          <div class="inline-flex items-center gap-2 px-8 py-4 rounded-full bezel-chassis border border-scroll-lima/60 text-scroll-lima text-xs font-black tracking-wide bg-scroll-lima/10 shadow-xl shadow-scroll-lima/20">
+            <i data-lucide="check-circle" class="w-4 h-4 text-scroll-lima"></i>
+            <span>Propuesta Lista para Implementar</span>
+          </div>
+          
+          <a href="https://wa.me/573017505981?text=Hola%20Santiago,%20revisamos%20la%20propuesta%20de%20Scroll%20y%20queremos%20avanzar%20con%20el%20proyecto." target="_blank" rel="noopener noreferrer" class="px-8 py-4 rounded-full font-display font-bold text-xs bezel-chassis text-white hover:border-scroll-lima transition flex items-center gap-2 hover:scale-105">
+            <i data-lucide="message-circle" class="w-4 h-4 text-scroll-lima"></i>
+            <span>Hablar por WhatsApp Directo</span>
+          </a>
+        </div>
+
+        <div class="pt-6 border-t border-white/10 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-400">
+          <span>Elaborado por: <strong class="text-white">Santiago Guerra</strong></span>
+          <span>•</span>
+          <span>Para: <strong class="text-white">Scroll — Agencia de Marketing</strong></span>
+          <span>•</span>
+          <span>Validez: <strong class="text-scroll-lima">30 Días</strong></span>
+        </div>
+
+      </div>
+
+
+      <!-- ======================================================== -->
+      <!-- DEMOSTRACIÓN FINAL: SIMULADOR DE VENTAS INMOBILIARIO & QR -->
+      <!-- (CASO REAL: CASA CAMPESTRE CERRITOS / METALEVEL) -->
+      <!-- ======================================================== -->
+      <div class="bezel-chassis p-7 sm:p-12 rounded-[36px] border border-scroll-turquesa/40 bg-[#021324] text-left shadow-2xl space-y-8">
+        
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-white/10">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-scroll-turquesa/10 text-scroll-turquesaLight border border-scroll-turquesa/30 text-[11px] font-bold uppercase tracking-wider mb-2 font-display">
+              <i data-lucide="home" class="w-3.5 h-3.5"></i>
+              <span>Demostración de Venta Inmobiliaria en Vivo</span>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-display font-black text-white">
+              Casa Campestre Villa Tradición • Cerritos, Pereira
+            </h3>
+            <p class="text-xs text-slate-300 mt-1">
+              Prueba cómo el asesor atiende como un vendedor de élite: sin ser invasivo, solicitando datos con sutileza, conociendo medidas exactas y enviando fotografías al instante.
+            </p>
+          </div>
+
+          <!-- BOTÓN QR QUE ABRE EL CHAT DIRECTO DE METALEVEL -->
+          <div class="flex items-center gap-4 bg-black/60 p-4 rounded-2xl border border-white/10 flex-shrink-0">
+            <div class="w-20 h-20 rounded-xl overflow-hidden bg-white p-1 flex-shrink-0">
+              <img src="qr_metalevel.png" alt="QR MetaLevel" class="w-full h-full object-contain">
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] text-scroll-lima uppercase font-bold tracking-wider block">Escanea con tu celular</span>
+              <a href="https://wa.me/573017505981?text=Hola%20equipo%20MetaLevel,%20estoy%20interesado%20en%20la%20casa%20campestre%20de%20Cerritos%20y%20quisiera%20recibir%20la%20ficha%20t%C3%A9cnica%20completa." target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-white hover:text-scroll-lima flex items-center gap-1 transition">
+                <span>Abrir Chat MetaLevel</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+              <p class="text-[9px] text-slate-400">+57 301 750 5981</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FICHA TÉCNICA DE LA CASA & SIMULADOR DE CHAT EN VIVO -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- COLUMNA IZQUIERDA: FICHA TÉCNICA Y FOTOS REALES (SPAN 6) -->
+          <div class="lg:col-span-6 space-y-5">
+            
+            <!-- Visor de Fotos -->
+            <div class="rounded-2xl overflow-hidden border border-white/10 relative group bg-black">
+              <img id="real-estate-main-img" src="assets_casa/fachada_casa.jpg" alt="Fachada Casa Campestre" class="w-full h-64 sm:h-72 object-cover transition-all duration-500">
+              <div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between">
+                <span id="real-estate-photo-caption" class="text-xs font-bold text-white">Fachada Principal con Piscina Sinfín & Atardecer</span>
+                <span class="text-[10px] text-scroll-lima bg-black/60 px-2 py-0.5 rounded-full font-mono">Foto Real HD</span>
+              </div>
+            </div>
+
+            <!-- Miniaturas para cambiar foto (Sin botones) -->
+            <div class="grid grid-cols-4 gap-2">
+              <div onclick="setHousePhoto('fachada')" class="rounded-xl overflow-hidden border border-white/20 hover:border-scroll-lima transition h-14 bg-black cursor-pointer">
+                <img src="assets_casa/fachada_casa.jpg" alt="Fachada" class="w-full h-full object-cover">
+              </div>
+              <div onclick="setHousePhoto('sala')" class="rounded-xl overflow-hidden border border-white/20 hover:border-scroll-lima transition h-14 bg-black cursor-pointer">
+                <img src="assets_casa/sala_principal.jpg" alt="Sala" class="w-full h-full object-cover">
+              </div>
+              <div onclick="setHousePhoto('cocina')" class="rounded-xl overflow-hidden border border-white/20 hover:border-scroll-lima transition h-14 bg-black cursor-pointer">
+                <img src="assets_casa/cocina_gourmet.jpg" alt="Cocina" class="w-full h-full object-cover">
+              </div>
+              <div onclick="setHousePhoto('suite')" class="rounded-xl overflow-hidden border border-white/20 hover:border-scroll-lima transition h-14 bg-black cursor-pointer">
+                <img src="assets_casa/habitacion_suite.jpg" alt="Habitación" class="w-full h-full object-cover">
+              </div>
+            </div>
+
+            <!-- Ficha Técnica Resumida -->
+            <div class="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3 text-xs">
+              <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                <span class="text-slate-400">Precio de Venta:</span>
+                <span class="text-base font-black text-scroll-lima font-mono">$1.450.000.000 COP</span>
+              </div>
+              <div class="grid grid-cols-2 gap-y-2 text-slate-300">
+                <div>• <strong>Ubicación:</strong> Condominio El Vergel, Cerritos</div>
+                <div>• <strong>Administración:</strong> $480.000 COP/mes</div>
+                <div>• <strong>Lote:</strong> 1.850 m² planos</div>
+                <div>• <strong>Construidos:</strong> 420 m² a doble altura</div>
+                <div>• <strong>Alcobas:</strong> 4 suites con baño y vestier</div>
+                <div>• <strong>Baños:</strong> 6 baños completos</div>
+                <div>• <strong>Estrato:</strong> 6 Residencial</div>
+                <div>• <strong>Parqueaderos:</strong> 6 vehículos (3 cubiertos)</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- COLUMNA DERECHA: CHAT SIMULADO DE VENTA INMOBILIARIA (SPAN 6) -->
+          <div class="lg:col-span-6 phone-mockup bg-[#091826] p-5 flex flex-col justify-between min-h-[580px]">
+            
+            <div>
+              <!-- Cabecera del WhatsApp -->
+              <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-scroll-petroleo flex items-center justify-center text-[#D4AF37] font-bold text-xs border border-[#D4AF37]/40">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                      MetaLevel Asesor Inmobiliario
+                      <span class="w-1.5 h-1.5 rounded-full bg-scroll-lima"></span>
+                    </h4>
+                    <p class="text-[10px] text-slate-400">Villa Tradición Cerritos • En línea</p>
+                  </div>
+                </div>
+                <span class="text-[9px] bg-white/10 text-scroll-lima px-2.5 py-0.5 rounded-full font-mono">IA Activa</span>
+              </div>
+
+              <!-- Indicador de Conversación Autónoma en Vivo (Scroll-Driven, Sin Botones) -->
+              <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 mb-4 text-[10px] text-slate-300">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-scroll-lima animate-pulse"></span>
+                  <strong class="text-white">Simulación en Vivo:</strong> Flujo conversacional autónomo
+                </span>
+                <span class="text-scroll-turquesa font-mono font-bold">Respuesta &lt; 10s</span>
+              </div>
+
+              <!-- Burbujas de Conversación Dinámicas -->
+              <div class="space-y-3 text-xs max-h-[340px] overflow-y-auto pr-1" id="realEstateChatBox">
+                
+                <!-- Mensaje del Prospecto -->
+                <div class="bg-[#163652] text-slate-200 p-3 rounded-2xl rounded-tl-sm max-w-[85%] border border-white/5">
+                  <p class="text-[11px] leading-relaxed">
+                    ¡Buenas tardes! Vi la publicación de la Casa Campestre Villa Tradición en Cerritos y me gustaría saber el precio y si tiene piscina privada.
+                  </p>
+                  <span class="text-[9px] text-slate-400 block text-right mt-1">10:45 AM</span>
+                </div>
+
+                <!-- Respuesta del Bot (Vendedor Ejemplar) -->
+                <div class="bg-scroll-blue text-white p-3.5 rounded-2xl rounded-tr-sm ml-auto max-w-[92%] border border-scroll-turquesa/30 shadow-md space-y-2">
+                  <p class="text-[11px] leading-relaxed">
+                    ¡Buenas tardes! Es un placer saludarte. ☀️ La <strong>Casa Campestre Villa Tradición</strong> tiene un valor de inversión de <strong>$1.450.000.000 COP</strong> y cuenta con una espectacular <strong>piscina sinfín climatizada con jacuzzi integrado</strong> con vista panorámica a las montañas de Cerritos.
+                  </p>
+                  <p class="text-[11px] leading-relaxed text-slate-200">
+                    Para brindarte la ficha técnica completa y compartirte el dossier fotográfico, ¿con quién tengo el gusto de hablar?
+                  </p>
+                  <span class="text-[9px] text-scroll-turquesaLight block text-right mt-0.5">10:45 AM · MetaLevel Asesor</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Entrada de Texto Simulada -->
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+              <span class="flex items-center gap-1.5 text-scroll-lima">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>Captura sutil de datos: Nombre, Teléfono y Correo</span>
+              </span>
+              <span class="text-[10px] text-slate-500 font-mono">100% Preciso</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+
+  <!-- ============================================================== -->
+  <!-- HIGH PERFORMANCE JAVASCRIPT (GSAP SCROLLTRIGGER + 3D CAROUSEL + DEMO) -->
+  <!-- ============================================================== -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Custom Cursor tracking (Desktop)
+    const cursor = document.getElementById('custom-cursor');
+    const cursorDot = document.getElementById('custom-cursor-dot');
+    if (cursor && cursorDot && window.innerWidth >= 768) {
+      window.addEventListener('mousemove', (e) => {
+        cursorDot.style.left = `${e.clientX}px`;
+        cursorDot.style.top = `${e.clientY}px`;
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+      });
+    }
+
+    /* ==========================================================================
+       1. GSAP SCROLLTRIGGER 3D PHONE INCOMING CALL & ZOOM DIVE INTO ICEBERG
+       ========================================================================== */
+    let heroST = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        const diveTimeline = gsap.timeline({ paused: true });
+
+        // Phase 1 (0.00 -> 0.25): Phone incoming call triggers, side columns & mobile header fade out
+        diveTimeline.to(['#hero-left-col', '#hero-right-col', '#hero-mobile-header'], {
+          opacity: 0,
+          scale: 0.92,
+          y: -25,
+          duration: 0.22,
+          ease: 'power2.inOut'
+        }, 0);
+
+        // Arrow notification badge pops away
+        diveTimeline.to('#arrow-notification-badge', {
+          opacity: 0,
+          scale: 0.2,
+          duration: 0.1,
+          ease: 'power2.in'
+        }, 0.03);
+
+        // 3D Arrow lifts from phone screen toward the viewer with brilliant neon bloom
+        diveTimeline.to('#scroll-lime-arrow-3d', {
+          z: 300,
+          scale: 1.45,
+          filter: 'drop-shadow(0px 25px 50px rgba(174, 249, 5, 0.9))',
+          duration: 0.26,
+          ease: 'power2.out'
+        }, 0.04);
+
+        // Incoming call ripples surge outwards
+        diveTimeline.to('#call-base-plinth .animate-ping', {
+          scale: 4,
+          opacity: 0,
+          duration: 0.24,
+          ease: 'power2.out'
+        }, 0.05);
+
+        // Call header subtitle fades smoothly
+        diveTimeline.to('#call-header p', {
+          opacity: 0.2,
+          duration: 0.12
+        }, 0.08);
+
+        // Phase 2 (0.20 -> 0.85): Fluid ZOOM-IN straight through the phone screen
+        // Phone scales up massively toward camera, centered in viewport
+        diveTimeline.to('#hero-phone-mockup', {
+          scale: 22,
+          z: 1100,
+          opacity: 0.02,
+          duration: 0.65,
+          ease: 'power3.in'
+        }, 0.20);
+
+        // 3D Arrow accelerates forward into camera and dissolves seamlessly
+        diveTimeline.to('#scroll-lime-arrow-3d', {
+          scale: 3.8,
+          z: 980,
+          opacity: 0,
+          duration: 0.52,
+          ease: 'power2.in'
+        }, 0.26);
+
+        // Screen call elements dissolve into pure cyan radiance
+        diveTimeline.to(['#call-header', '#call-footer', '#phone-notch', '#call-base-plinth'], {
+          opacity: 0,
+          duration: 0.22,
+          ease: 'power2.in'
+        }, 0.20);
+
+        // Phase 3 (0.55 -> 1.00): Portal curtain flash creates the underwater / hyperspace dissolve into #iceberg
+        diveTimeline.to('#dive-portal-curtain', {
+          opacity: 0.95,
+          duration: 0.28,
+          ease: 'power2.inOut'
+        }, 0.55);
+
+        diveTimeline.to('#dive-portal-curtain', {
+          opacity: 0,
+          duration: 0.26,
+          ease: 'power2.out'
+        }, 0.82);
+
+        // ScrollTrigger sincronizado con sticky nativo
+        heroST = ScrollTrigger.create({
+          trigger: '#hero-pin-wrapper',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.1,
+          animation: diveTimeline
+        });
+
+
+
+        // MetaLevel brand fusion glow animation on scroll
+        gsap.to('#metalevel-logo-glow', {
+          scrollTrigger: {
+            trigger: '#metalevel-fusion-box',
+            start: 'top 75%',
+            end: 'bottom 50%',
+            scrub: true
+          },
+          borderColor: '#AEF905',
+          boxShadow: '0 0 35px rgba(174, 249, 5, 0.4)'
+        });
+      }
+
+      // Re-calculate ScrollTrigger triggers on window resize or load
+      window.addEventListener('load', () => {
+        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+      });
+      window.addEventListener('hashchange', () => {
+        setTimeout(() => {
+          if (typeof ScrollTrigger !== 'undefined') {
+            ScrollTrigger.refresh();
+            ScrollTrigger.update();
+          }
+        }, 80);
+      });
+    });
+
+    // Helper: Contestar la llamada y hacer scroll suave al iceberg
+    function answerCall() {
+      if (heroST) {
+        window.scrollTo({
+          top: heroST.end + 5,
+          behavior: 'smooth'
+        });
+      } else {
+        const icebergSec = document.getElementById('iceberg');
+        if (icebergSec) icebergSec.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    /* ==========================================================================
+       2. AMBIENT GPU CANVAS
+       ========================================================================== */
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    let width = 0, height = 0;
+    let embers = [];
+
+    function resizeCanvas() {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    function initEmbers() {
+      embers = [];
+      const count = window.innerWidth < 768 ? 16 : 30;
+      for (let i = 0; i < count; i++) {
+        embers.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 2 + 1,
+          speedY: Math.random() * 0.35 + 0.15,
+          speedX: (Math.random() - 0.5) * 0.2,
+          opacity: Math.random() * 0.5 + 0.2,
+          pulse: Math.random() * Math.PI * 2,
+          color: Math.random() > 0.4 ? 'rgba(174, 249, 5, ' : 'rgba(2, 204, 181, '
+        });
+      }
+    }
+
+    function drawAmbientCanvas() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, width, height);
+
+      for (let e of embers) {
+        e.y -= e.speedY;
+        e.x += e.speedX;
+        e.pulse += 0.03;
+        if (e.y < -10) e.y = height + 10;
+        if (e.x < -10) e.x = width + 10;
+        if (e.x > width + 10) e.x = -10;
+
+        const currentOpacity = e.opacity * (0.6 + 0.4 * Math.sin(e.pulse));
+        ctx.fillStyle = e.color + currentOpacity + ')';
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(drawAmbientCanvas);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initEmbers();
+      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    });
+
+    resizeCanvas();
+    initEmbers();
+    requestAnimationFrame(drawAmbientCanvas);
+
+    /* ==========================================================================
+       3. INTERACTIVE 3D DEVICE SWITCHER (SAAS MODULES)
+       ========================================================================== */
+    const panelsData = {
+      1: {
+        tag: 'Módulo 01 • Control Master',
+        title: 'Panel Master Scroll',
+        desc: 'Scroll crea, suspende y administra empresas clientes en 30 segundos. Control total sobre consumos globales de IA, tokens y estados de conexión de WhatsApp en vivo.',
+        status: '12 Empresas Conectadas',
+        m1: ['Total Atendidos', '1.840'],
+        m2: ['Leads Calificados', '428'],
+        m3: ['Tiempo Promedio', '6.4 seg'],
+        m4: ['Ahorro Humano', '160 horas']
+      },
+      2: {
+        tag: 'Módulo 02 • Seguridad & Privacidad',
+        title: 'Aislamiento Total por Empresa',
+        desc: 'Las bases de datos, historiales de chat y catálogos de cada empresa están 100% aislados en contenedores multi-tenant. Ningún cliente puede ver datos de otro negocio.',
+        status: '100% Blindaje Multi-Tenant',
+        m1: ['Bases Aisladas', '12 / 12'],
+        m2: ['Encriptación', 'AES-256'],
+        m3: ['Filtraciones', '0'],
+        m4: ['Auditoría', 'Activa']
+      },
+      3: {
+        tag: 'Módulo 03 • Gestión de Productos',
+        title: 'Catálogo & Reglas Vivas',
+        desc: 'Permite editar productos, precios, fotos, promociones y preguntas filtro en tiempo real para que el bot responda con precisión matemática sin inventar datos.',
+        status: 'Actualización en Caliente',
+        m1: ['Productos Activos', '142'],
+        m2: ['Preguntas Filtro', '8 Reglas'],
+        m3: ['Precisión Info', '99.8%'],
+        m4: ['Fotos en Chat', 'Habilitadas']
+      },
+      4: {
+        tag: 'Módulo 04 • Finanzas & Facturación',
+        title: 'Medidor de Consumo IA',
+        desc: 'Mide con exactitud cuántos tokens y mensajes consumió cada cliente. Scroll le factura el consumo a cada empresa con su propio margen comercial garantizado.',
+        status: 'Medidor en Vivo',
+        m1: ['Tokens Mes', '4.2M'],
+        m2: ['Costo Servidor', 'Controlado'],
+        m3: ['Margen Scroll', 'Directo'],
+        m4: ['Cuentas Claras', '100%']
+      },
+      5: {
+        tag: 'Módulo 05 • Fuerza de Ventas',
+        title: 'Alertas & Exportación a Excel',
+        desc: 'Avisa en tiempo real al equipo comercial cuando un prospecto está calificado y permite descargar toda la base de datos de leads en Excel con un solo clic.',
+        status: 'Notificaciones 24/7',
+        m1: ['Alertas Enviadas', '428'],
+        m2: ['Tasa Apertura', '98%'],
+        m3: ['Formato', 'Excel .xlsx'],
+        m4: ['Traspaso Humano', 'Instantáneo']
+      },
+      6: {
+        tag: 'Módulo 06 • Retención Estratégica',
+        title: 'Reportes de Retorno al Cliente',
+        desc: 'Métricas mensuales listas para mostrar en juntas directivas: total de atendidos, calificados y traspasados a asesor humano para demostrar el valor del marketing.',
+        status: 'Reporte Mensual Listo',
+        m1: ['Clientes Retenidos', '94%'],
+        m2: ['ROI Demostrado', 'Claro'],
+        m3: ['Juntas Directivas', 'Aprobadas'],
+        m4: ['Valor Percibido', 'Indiscutible']
+      }
+    };
+
+    let currentActiveModule = 1;
+
+    function applyModuleData(data) {
+      const tagEl = document.getElementById('device-module-tag');
+      const titleEl = document.getElementById('device-module-title');
+      const descEl = document.getElementById('device-module-desc');
+      const statusEl = document.getElementById('device-status-badge');
+      if (tagEl) tagEl.textContent = data.tag;
+      if (titleEl) titleEl.textContent = data.title;
+      if (descEl) descEl.textContent = data.desc;
+      if (statusEl) statusEl.textContent = data.status;
+
+      const miniMetrics = document.getElementById('device-mini-metrics');
+      if (miniMetrics) {
+        miniMetrics.innerHTML = `
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[9px] text-slate-400 uppercase font-semibold block">${data.m1[0]}</span>
+            <span class="text-base sm:text-lg font-black text-white font-mono">${data.m1[1]}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[9px] text-slate-400 uppercase font-semibold block">${data.m2[0]}</span>
+            <span class="text-base sm:text-lg font-black text-scroll-lima font-mono">${data.m2[1]}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[9px] text-slate-400 uppercase font-semibold block">${data.m3[0]}</span>
+            <span class="text-base sm:text-lg font-black text-scroll-turquesa font-mono">${data.m3[1]}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[9px] text-slate-400 uppercase font-semibold block">${data.m4[0]}</span>
+            <span class="text-base sm:text-lg font-black text-white font-mono">${data.m4[1]}</span>
+          </div>
+        `;
+      }
+    }
+
+    function transitionDeviceContent(moduleIdx, deviceType) {
+      const data = panelsData[moduleIdx];
+      if (!data) return;
+
+      const inner = document.getElementById('device-screen-inner');
+      if (inner && typeof gsap !== 'undefined') {
+        gsap.to(inner, {
+          y: -14,
+          opacity: 0,
+          duration: 0.16,
+          ease: 'power2.in',
+          onComplete: () => {
+            applyModuleData(data);
+            gsap.fromTo(inner, 
+              { y: 14, opacity: 0 }, 
+              { y: 0, opacity: 1, duration: 0.26, ease: 'power2.out' }
+            );
+          }
+        });
+      } else {
+        applyModuleData(data);
+      }
+
+      // Step counter and pill indicators
+      const stepCounter = document.getElementById('saas-step-counter');
+      if (stepCounter) {
+        stepCounter.textContent = `MÓDULO 0${moduleIdx} DE 06 • ${data.title.toUpperCase()}`;
+      }
+      document.querySelectorAll('.saas-progress-step').forEach((step, idx) => {
+        if (idx + 1 === moduleIdx) {
+          step.classList.add('bg-scroll-lima', 'scale-125');
+          step.classList.remove('bg-white/20');
+        } else {
+          step.classList.remove('bg-scroll-lima', 'scale-125');
+          step.classList.add('bg-white/20');
+        }
+      });
+
+      // Bento cards active border
+      document.querySelectorAll('.bento-panel-card').forEach((card, idx) => {
+        if (idx + 1 === moduleIdx) {
+          card.classList.add('border-scroll-lima', 'shadow-lg', 'shadow-scroll-lima/20');
+        } else {
+          card.classList.remove('border-scroll-lima', 'shadow-lg', 'shadow-scroll-lima/20');
+        }
+      });
+
+      switchDeviceView(deviceType);
+    }
+
+    function selectPanel(id) {
+      currentActiveModule = id;
+      let targetDevice = 'laptop';
+      if (id === 2 || id === 3) targetDevice = 'desktop';
+      else if (id === 4 || id === 5) targetDevice = 'tablet';
+      else if (id === 6) targetDevice = 'mobile';
+      transitionDeviceContent(id, targetDevice);
+    }
+
+    function switchDeviceView(type) {
+      document.querySelectorAll('.device-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-scroll-lima', 'text-scroll-navy', 'border-scroll-lima');
+        btn.classList.add('bg-white/5', 'text-slate-300', 'border-white/10');
+      });
+
+      const activeBtn = document.getElementById('btn-device-' + type);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-white/5', 'text-slate-300', 'border-white/10');
+        activeBtn.classList.add('bg-scroll-lima', 'text-scroll-navy', 'border-scroll-lima');
+      }
+
+      const chassis = document.getElementById('device-3d-chassis');
+      const bar = document.getElementById('device-address-bar');
+
+      if (type === 'laptop') {
+        chassis.style.transform = 'rotateY(0deg) scale(1)';
+        chassis.style.maxWidth = '100%';
+        if (bar) bar.textContent = 'https://scroll.agencia/admin/panel-master';
+      } else if (type === 'desktop') {
+        chassis.style.transform = 'rotateY(-4deg) rotateX(2deg) scale(1.02)';
+        chassis.style.maxWidth = '100%';
+        if (bar) bar.textContent = 'https://scroll.agencia/dashboard/empresas-activas';
+      } else if (type === 'tablet') {
+        chassis.style.transform = 'rotateY(6deg) scale(0.92)';
+        chassis.style.maxWidth = '780px';
+        if (bar) bar.textContent = 'https://scroll.agencia/tablet-view';
+      } else if (type === 'mobile') {
+        chassis.style.transform = 'rotateY(-8deg) scale(0.85)';
+        chassis.style.maxWidth = '460px';
+        if (bar) bar.textContent = 'https://scroll.agencia/m';
+      }
+    }
+
+    /* ==========================================================================
+       4. REAL ESTATE SIMULATOR & PHOTOS (CASA TRADICIÓN - METALEVEL)
+       ========================================================================== */
+    const housePhotos = {
+      fachada: {
+        src: 'assets_casa/fachada_casa.jpg',
+        caption: 'Fachada Principal con Piscina Sinfín & Atardecer en Cerritos'
+      },
+      sala: {
+        src: 'assets_casa/sala_principal.jpg',
+        caption: 'Sala Principal a Doble Altura con Ventanales Piso-Techo'
+      },
+      cocina: {
+        src: 'assets_casa/cocina_gourmet.jpg',
+        caption: 'Cocina Gourmet Tipo Isla con Acabados en Cuarzo Calacatta'
+      },
+      suite: {
+        src: 'assets_casa/habitacion_suite.jpg',
+        caption: 'Suite Principal con Baño Spa Privado & Terraza'
+      }
+    };
+
+    function setHousePhoto(key) {
+      const p = housePhotos[key];
+      if (!p) return;
+      const img = document.getElementById('real-estate-main-img');
+      const cap = document.getElementById('real-estate-photo-caption');
+      if (img) {
+        img.style.opacity = '0.3';
+        setTimeout(() => {
+          img.src = p.src;
+          img.style.opacity = '1';
+        }, 150);
+      }
+      if (cap) cap.textContent = p.caption;
+    }
+
+    function askRealEstateBot(topic) {
+      const box = document.getElementById('realEstateChatBox');
+      if (!box) return;
+
+      let userQ = '';
+      let botA = '';
+
+      if (topic === 'precio') {
+        userQ = '¿Qué precio tiene y cuánto paga de administración?';
+        botA = 'Con mucho gusto. El valor de venta es de <strong>$1.450.000.000 COP</strong> (precio de oportunidad directa). La cuota de administración en el Condominio El Vergel es de <strong>$480.000 COP mensuales</strong>, e incluye vigilancia privada 24/7, circuito cerrado de TV, ronderos y mantenimiento de áreas comunes.<br><br>¿Te gustaría que te comparta el dossier financiero con opciones de pago?';
+      } else if (topic === 'medidas') {
+        userQ = '¿Cuánto mide el lote y el área construida?';
+        botA = 'La propiedad cuenta con un <strong>lote plano de 1.850 m²</strong> rodeado de cerca viva y paisajismo tropical, y un <strong>área construida de 420 m²</strong> con diseño a doble altura para máxima frescura e iluminación natural.<br><br>Tiene 4 alcobas tipo suite (todas con baño privado y vestier) más alcoba de servicio.';
+      } else if (topic === 'cocina') {
+        userQ = 'Muéstrame fotos de la cocina y de la sala principal.';
+        setHousePhoto('cocina');
+        botA = '¡Por supuesto! Acabo de proyectar la <strong>Cocina Gourmet</strong> en el visor. Cuenta con isla central en cuarzo Calacatta, torre de hornos empotrada, cava de vinos retroiluminada y ventanales corredizos que integran la cocina con la terraza BBQ exterior.<br><br>Si deseas ver la sala, solo toca la miniatura o dímelo por acá.';
+      } else if (topic === 'visita') {
+        userQ = 'Quiero agendar una visita privada para conocer la casa.';
+        botA = 'Excelente decisión. Coordinamos visitas privadas personalizadas de lunes a sábado en Cerritos para que recorras la casa con calma.<br><br>Por favor indícame tu <strong>Nombre completo, número de WhatsApp y correo</strong> para que nuestro asesor senior reserve tu espacio y te envíe la ubicación exacta de acceso al condominio.';
+      }
+
+      box.innerHTML += `
+        <div class="bg-[#163652] text-slate-200 p-3 rounded-2xl rounded-tl-sm max-w-[85%] border border-white/5 animate-fade-in">
+          <p class="text-[11px] leading-relaxed">${userQ}</p>
+          <span class="text-[9px] text-slate-400 block text-right mt-1">Ahora</span>
+        </div>
+        <div class="bg-scroll-blue text-white p-3.5 rounded-2xl rounded-tr-sm ml-auto max-w-[92%] border border-scroll-turquesa/30 shadow-md space-y-1.5 animate-fade-in">
+          <p class="text-[11px] leading-relaxed">${botA}</p>
+          <span class="text-[9px] text-scroll-turquesaLight block text-right mt-0.5">Ahora · MetaLevel Asesor</span>
+        </div>
+      `;
+
+      box.scrollTop = box.scrollHeight;
+      lucide.createIcons();
+    }
+
+    /* ==========================================================================
+       5. CONFETTI DE APROBACIÓN
+       ========================================================================== */
+    function approveProposal() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#AEF905', '#02E7C1', '#034B8C', '#ffffff']
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 80,
+            angle: 60,
+            spread: 60,
+            origin: { x: 0 },
+            colors: ['#AEF905', '#02E7C1']
+          });
+          confetti({
+            particleCount: 80,
+            angle: 120,
+            spread: 60,
+            origin: { x: 1 },
+            colors: ['#AEF905', '#02E7C1']
+          });
+        }, 250);
+      }
+    }
+
+    /* ==========================================================================
+       6. VANILLA INTERSECTION OBSERVER SCROLL REVEAL (OPACITY 0->1, TRANSLATEY 30PX -> 0 EASE-OUT)
+       ========================================================================== */
+    const revealCallback = (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    };
+
+    const revealObserver = new IntersectionObserver(revealCallback, {
+      root: null,
+      rootMargin: '0px 0px -40px 0px',
+      threshold: 0.1
+    });
+
+    function initScrollReveals() {
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        revealObserver.observe(el);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initScrollReveals);
+    } else {
+      initScrollReveals();
+    }
+
+    /* ==========================================================================
+       7. SCROLL-DRIVEN AUTONOMOUS INTERACTIONS (NO BUTTONS REQUIRED)
+       ========================================================================== */
+
+    // 2. Pinned SaaS Multi-Device Explorer driven by ScrollTrigger
+    if (typeof ScrollTrigger !== 'undefined' && document.getElementById('saas-pin-wrapper')) {
+      ScrollTrigger.create({
+        trigger: '#saas-pin-wrapper',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.1,
+        onUpdate: (self) => {
+          // progress goes from 0.0 to 1.0 mapped to modules 1 to 6
+          const targetModule = Math.min(6, Math.max(1, Math.floor(self.progress * 5.99) + 1));
+          let targetDevice = 'laptop';
+          if (targetModule === 2 || targetModule === 3) targetDevice = 'desktop';
+          else if (targetModule === 4 || targetModule === 5) targetDevice = 'tablet';
+          else if (targetModule === 6) targetDevice = 'mobile';
+
+          if (targetModule !== currentActiveModule) {
+            currentActiveModule = targetModule;
+            transitionDeviceContent(targetModule, targetDevice);
+          }
+        }
+      });
+    }
+
+    // 3. Parallax entrance and glowing expansion for Chapter Portals
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      document.querySelectorAll('.chapter-transition-portal').forEach(portal => {
+        const badge = portal.querySelector('.portal-badge');
+        const lineIn = portal.querySelector('.portal-line-in');
+        const lineOut = portal.querySelector('.portal-line-out');
+
+        if (badge) {
+          gsap.from(badge, {
+            scrollTrigger: {
+              trigger: portal,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse'
+            },
+            scale: 0.88,
+            opacity: 0,
+            duration: 0.5,
+            ease: 'back.out(1.5)'
+          });
+        }
+
+        if (lineIn && lineOut) {
+          gsap.from([lineIn, lineOut], {
+            scrollTrigger: {
+              trigger: portal,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse'
+            },
+            scaleY: 0,
+            duration: 0.5,
+            ease: 'power2.out'
+          });
+        }
+      });
+    }
+
+    // Autonomous Real Estate Chat Sequence & Celebration triggered when entering #aprobacion
+    let chatSimStarted = false;
+    const aprobacionSection = document.getElementById('aprobacion');
+    if (aprobacionSection) {
+      const aprobacionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !chatSimStarted) {
+            chatSimStarted = true;
+            setTimeout(() => {
+              askRealEstateBot('precio');
+            }, 1200);
+            setTimeout(() => {
+              askRealEstateBot('cocina');
+            }, 4500);
+            setTimeout(() => {
+              askRealEstateBot('visita');
+            }, 8200);
+            setTimeout(() => {
+              approveProposal();
+            }, 11000);
+          }
+        });
+      }, { threshold: 0.2 });
+      aprobacionObserver.observe(aprobacionSection);
+    }
+  </script>
+</body>
+</html>
